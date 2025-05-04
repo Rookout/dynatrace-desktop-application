@@ -4,7 +4,6 @@
   "description": "dynatrace desktop application's site addon to support local files and folders",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "patch-package",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.main.config.js && cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.index-worker.config.js",
     "postbuild": "copyfiles index-worker.html ./dist/",
     "package-linux": "electron-builder --linux APPIMAGE",
@@ -128,7 +127,6 @@
     "lodash": "^4.17.21",
     "log4js": "6.7.1",
     "parse-repo": "^1.0.4",
-    "patch-package": "^6.4.0",
     "postinstall-postinstall": "^2.1.0",
     "semver": "7.5.4",
     "slash": "3.0.0",
