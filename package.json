@@ -63,7 +63,7 @@
     },
     "win": {
       "publisherName": [
-        "Rookout LTD"
+        "Dynatrace Israel LTD"
       ],
       "target": "NSIS",
       "sign": "./sign_windows.js",
@@ -80,7 +80,7 @@
   ],
   "author": {
     "email": "support@rookout.com",
-    "name": "Rookout"
+    "name": "Dynatrace Israel LTD"
   },
   "license": "MIT",
   "devDependencies": {
