@@ -1,6 +1,6 @@
 {
   "name": "dynatrace-desktop-application",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "dynatrace desktop application's site addon to support local files and folders",
   "main": "dist/index.js",
   "scripts": {
@@ -63,7 +63,7 @@
     },
     "win": {
       "publisherName": [
-        "Rookout LTD"
+        "Dynatrace Israel LTD"
       ],
       "target": "NSIS",
       "sign": "./sign_windows.js",
@@ -80,7 +80,7 @@
   ],
   "author": {
     "email": "support@rookout.com",
-    "name": "Rookout"
+    "name": "Dynatrace Israel LTD"
   },
   "license": "MIT",
   "devDependencies": {
