@@ -114,7 +114,6 @@ workflows:
   publish-pipeline:
     jobs:
       - version_validation:
-          requires:
           <<: *filter_master
       - publish:
           requires:
