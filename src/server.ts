@@ -1,7 +1,7 @@
 import {makeExecutableSchema} from "@graphql-tools/schema";
 import {ApolloServerPluginLandingPageDisabled} from "@apollo/server/plugin/disabled";
 import {ApolloServer} from "@apollo/server";
-import {expressMiddleware} from '@apollo/server/express4';
+import {expressMiddleware} from '@as-integrations/express5';
 import * as express from "express";
 import {readFileSync} from "fs";
 import {applyMiddleware} from "graphql-middleware";
