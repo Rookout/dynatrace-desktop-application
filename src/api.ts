@@ -1,31 +1,30 @@
 import fs = require("fs");
 import {posix} from "path";
 import {
-  BitBucketOnPremInput,
-  BitbucketOnPremRepoProps,
-  BitbucketOnPremTreeInput,
-  BitbucketProperties,
-  BitbucketPropertiesInput,
-  cacheFileTree,
-  cancelCacheBitbucketTree,
-  cleanBitbucketTreeCache,
-  getBitbucketProperties,
-  getBranchesForRepoFromBitbucket,
-  getCommitDetailsFromBitbucket,
-  getCommitsForRepoFromBitbucket,
-  getCurrentlyCachedRepo,
-  getFileContentFromBitbucket,
-  getFileTreeByPath,
-  getFileTreeFromBitbucket,
-  getFileTreeLargerThan,
-  getFileTreePageLimit,
-  getIsTreeCached,
-  getProjectsFromBitbucket,
-  getReposForProjectFromBitbucket,
-  getUserFromBitbucket,
-  idsOfAllCachedTrees,
-  removeFileTreeFromCache,
-  searchBitbucketTree
+    BitBucketOnPremInput,
+    BitbucketOnPremRepoProps,
+    BitbucketOnPremTreeInput,
+    BitbucketProperties,
+    BitbucketPropertiesInput,
+    cacheFileTree,
+    getBitbucketProperties,
+    getBranchesForRepoFromBitbucket,
+    getCommitDetailsFromBitbucket,
+    getCommitsForRepoFromBitbucket,
+    getCurrentlyCachedRepo,
+    getFileContentFromBitbucket,
+    getFileTreeByPath,
+    getFileTreeFromBitbucket,
+    getFileTreeLargerThan,
+    getFileTreePageLimit,
+    getIsTreeCached,
+    getProjectsFromBitbucket,
+    getReposForProjectFromBitbucket,
+    getSpecificTagForRepoFromBitbucket,
+    getTagsForRepoFromBitbucket,
+    getUserFromBitbucket,
+    idsOfAllCachedTrees,
+    searchBitbucketTree
 } from "./BitBucketOnPrem";
 import {Repository} from "./common/repository";
 import {notify, USER_EMAIL_KEY} from "./exceptionManager";
@@ -221,12 +220,6 @@ export const resolvers = {
         getFileTreeLargerThan(args),
     cacheTree: async (parent: any, { args }: BitBucketOnPremInput): Promise<boolean> =>
         cacheFileTree(args),
-    cancelCacheTree: async (parent: any): Promise<boolean> =>
-        cancelCacheBitbucketTree(),
-    removeTreeFromCache: async (parent: any, { args }: BitbucketOnPremTreeInput): Promise<boolean> =>
-        removeFileTreeFromCache(args),
-    cleanTreeCache: async (parent: any): Promise<boolean> =>
-        cleanBitbucketTreeCache(),
     isTreeCached: async (parent: any, { args }: BitbucketOnPremTreeInput): Promise<boolean> =>
         getIsTreeCached(args),
     allCachedRepos: async (parent: any): Promise<BitbucketOnPremRepoProps[]> =>
@@ -243,6 +236,10 @@ export const resolvers = {
     commits: async (parent: any, { args }: BitBucketOnPremInput): Promise<any> =>
         getCommitsForRepoFromBitbucket(args),
     commit: async (parent: any, { args }: BitBucketOnPremInput): Promise<any> => getCommitDetailsFromBitbucket(args),
+    tags: async (parent: any, {args}: BitBucketOnPremInput): Promise<any> =>
+        getTagsForRepoFromBitbucket(args),
+    tag: async (parent: any, {args}: BitBucketOnPremInput): Promise<any> =>
+        getSpecificTagForRepoFromBitbucket(args),
     branches: async (parent: any, { args }: BitBucketOnPremInput): Promise<any> =>
         getBranchesForRepoFromBitbucket(args),
     file: async (parent: any, { args }: BitBucketOnPremInput): Promise<string> =>

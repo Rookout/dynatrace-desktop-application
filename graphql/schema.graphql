@@ -44,6 +44,7 @@ input BitbucketInput {
   accessToken: String!
   projectKey: String
   repoName: String
+  tagId: String
   commit: String
   branch: String
   filePath: String
@@ -73,9 +74,6 @@ type BitbucketOnPrem {
   fileTreePageLimit(args: BitbucketInput!): Int
   isTreeLargerThan(args: BitbucketInput!): Boolean
   cacheTree(args: BitbucketInput!): Boolean
-  cancelCacheTree: Boolean
-  removeTreeFromCache(args: BitbucketTreeInput!): Boolean
-  cleanTreeCache: Boolean
   isTreeCached(args: BitbucketTreeInput!): Boolean
   allCachedRepos: [BitbucketRepoBeingCached]
   searchTree(args: BitbucketTreeInput!): [String]
@@ -86,6 +84,8 @@ type BitbucketOnPrem {
   repos(args: BitbucketInput!): [BitbucketRepo]
   commits(args: BitbucketInput!): [BitbucketCommit] @deprecated(reason: "Unused")
   commit(args: BitbucketInput!): BitbucketCommit
+  tag(args: BitbucketInput!): BitbucketTag
+  tags(args: BitbucketInput!): [BitbucketTag]
   branches(args: BitbucketInput!): [BitbucketBranch]
   file(args: BitbucketInput!): String
   bitbucketProperties(args: BitbucketPropertiesInput!): BitbucketProperties
@@ -133,6 +133,13 @@ type BitbucketCommit {
   committer: BitbucketUser!
   message: String!
   authorTimestamp: Float!
+}
+
+type BitbucketTag {
+  id: String!
+  displayId: String!
+  latestCommit: String!
+  latestChangeset: String!
 }
 
 type BitbucketBranch {
