@@ -24,6 +24,7 @@ const MAX_PAGE_SIZES = {
     PROJECTS: 1_000,
     REPOSITORIES: 1_000,
     BRANCHES: 1_000,
+    TAGS: 1_000,
     COMMITS: 100
 };
 
@@ -41,6 +42,9 @@ export interface BitbucketOnPrem {
     repoName?: string;
     commit?: string;
     branch?: string;
+    tagId?: string;
+    tags?: string;
+    tag?: string;
     fileTree?: string[];
     filePath?: string;
     treeSize?: number;
@@ -300,16 +304,6 @@ export const cacheFileTree = async ({url, accessToken, projectKey, repoName, com
     }
 };
 
-export const cancelCacheBitbucketTree = async (): Promise<boolean> => {
-    if (repoCurrentlyBeingCached) {
-        abortCache = true;
-        return true;
-    } else {
-        // Nothing to abort
-        return false;
-    }
-};
-
 export const getIsTreeCached = async ({projectKey, repoName, commit}: BitbucketOnPremRepoProps): Promise<boolean> => {
     logger.debug("Checking if tree is already cached", {projectKey, repoName, commit});
     const currentCachedRepos = JSON.parse(store.get("bitbucketTrees", "{}"));
@@ -326,27 +320,6 @@ export const idsOfAllCachedTrees = async (): Promise<BitbucketOnPremRepoProps[]>
         ids.push(getRepoFromId(id));
     });
     return ids;
-};
-
-export const removeFileTreeFromCache = async ({projectKey, repoName, commit}: BitbucketOnPremRepoProps): Promise<boolean> => {
-    logger.debug("Trying to remove tree from cache", {projectKey, repoName, commit});
-    const currentCachedRepos = JSON.parse(store.get("bitbucketTrees", "{}"));
-    const repoId = getRepoId({projectKey, repoName, commit});
-    // Check if the tree is already cached
-    if (!currentCachedRepos[repoId]) {
-        logger.debug("Tree is not in cache", {projectKey, repoName, commit});
-        return false;
-    }
-    delete currentCachedRepos[repoId];
-    store.set("bitbucketTrees", JSON.stringify(currentCachedRepos));
-    logger.debug("Successfully removed tree from cache", {projectKey, repoName, commit});
-    return true;
-};
-
-export const cleanBitbucketTreeCache = async (): Promise<boolean> => {
-    logger.debug("Cleaning tree cache");
-    store.set("bitbucketTrees", "{}");
-    return true;
 };
 
 export const getCurrentlyCachedRepo = async (): Promise<BitbucketOnPremRepoProps> => {
@@ -477,6 +450,42 @@ export const getBranchesForRepoFromBitbucket = async ({url, accessToken, project
     });
     logger.debug("Finished getting branches for repo", {url, projectKey, repoName, branches: JSON.stringify(branches)});
     return branches;
+};
+
+export const getTagsForRepoFromBitbucket = async ({url, accessToken, projectKey, repoName}: BitbucketOnPrem) => {
+    logger.debug("Getting tags for repo", {url, projectKey, repoName});
+    const tagsQuery = UrlAssembler(url).template("/rest/api/1.0/projects/:projectKey/repos/:repoName/tags").param({
+        projectKey,
+        repoName
+    }).toString();
+
+    const tags: string[] = await fetchAllPages({
+        url: tagsQuery, accessToken, maxPageSize: MAX_PAGE_SIZES.TAGS, hasQueryParams: false
+    });
+
+    logger.debug("Finished getting tags for repo", {url, projectKey, repoName, tags: JSON.stringify(tags)});
+    // console.log(tags);
+    return tags;
+};
+
+export const getSpecificTagForRepoFromBitbucket = async ({url, accessToken, projectKey, repoName, tagId}: BitbucketOnPrem) => {
+    logger.debug(`Getting tag with ID: "${tagId}", for repo`, {url, projectKey, repoName});
+
+    const specificTagQuery = UrlAssembler(url).template(`/rest/api/1.0/projects/:projectKey/repos/:repoName/tags/:tagId`).param({
+        projectKey,
+        repoName,
+        tagId
+    }).toString();
+
+    const tag = await fetchNoCache(specificTagQuery, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    });
+
+    logger.debug(`Finished getting tag with ID: "${tagId}", for repo`, {url, projectKey, repoName, tag: JSON.stringify(tag)});
+
+    return tag.json();
 };
 
 export const getFileContentFromBitbucket = async ({url, accessToken, projectKey, repoName, commit, filePath}: BitbucketOnPrem) => {
