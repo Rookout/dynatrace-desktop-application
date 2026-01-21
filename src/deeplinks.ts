@@ -8,6 +8,7 @@ export const initDeeplinks = (app: Electron.App) => {
     PROTOCOLS.forEach(protocol => {
         if (!process.defaultApp) {
             app.setAsDefaultProtocolClient(protocol);
+            return;
         }    
         if (process.argv.length >= 2) {
             app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])]);
