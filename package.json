@@ -1,6 +1,6 @@
 {
   "name": "dynatrace-desktop-application",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "dynatrace desktop application's site addon to support local files and folders",
   "main": "dist/index.js",
   "scripts": {
@@ -34,7 +34,8 @@
     "protocols": {
       "name": "rookout",
       "schemes": [
-        "rookout"
+        "rookout",
+        "dynatrace"
       ]
     },
     "files": [
@@ -49,7 +50,8 @@
       "target": "appImage",
       "category": "Utility",
       "mimeTypes": [
-        "x-scheme-handler/rookout"
+        "x-scheme-handler/rookout",
+        "x-scheme-handler/dynatrace"
       ],
       "desktop": {
         "exec": "rookout %u"
