@@ -9,10 +9,9 @@ export const initDeeplinks = (app: Electron.App) => {
         if (!process.defaultApp) {
             app.setAsDefaultProtocolClient(protocol);
         }    
-            if (process.argv.length >= 2) {
-                app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])]);
-            }
-        } 
+        if (process.argv.length >= 2) {
+            app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])]);
+        }
     });
 
     app.on("open-url", deeplinkHandler);
