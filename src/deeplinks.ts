@@ -2,7 +2,7 @@ import {dialog} from "electron";
 
 const path = require("path");
 
-const PROTOCOLS = ["dynatrace", "rookout"];
+const PROTOCOLS = ["rookout", "dynatrace"];
 
 export const initDeeplinks = (app: Electron.App) => {
     PROTOCOLS.forEach(protocol => {
@@ -16,6 +16,7 @@ export const initDeeplinks = (app: Electron.App) => {
     });
 
     app.on("open-url", deeplinkHandler);
+    deeplinkHandler();
 };
 
 export const deeplinkHandler = () => {
