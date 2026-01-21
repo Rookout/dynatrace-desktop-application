@@ -1,4 +1,4 @@
-FROM node:18.18.0-alpine as build
+FROM node:24.13.0-alpine as build
 
 ENV env=development
 WORKDIR /build
@@ -11,7 +11,7 @@ COPY . .
 
 RUN yarn run build-headless
 
-FROM node:18.18.0-alpine as release
+FROM node:24.13.0-alpine as release
 
 WORKDIR /app
 COPY --from=build /build/dist /app/dist

@@ -26,6 +26,12 @@ type CommitDescription {
   oid: String!
 }
 
+type OsInfo {
+  type: String!
+  version: String!
+  arch: String!
+}
+
 type Query {
   appVersion: String!
   dir(repoId: String!, path: String!): [FileInfo]!
@@ -37,6 +43,7 @@ type Query {
   repository(repoId: String!): Repository!
   BitbucketOnPrem: BitbucketOnPrem!
   recentLogs: [Log]!
+  osInfo: OsInfo!
 }
 
 input BitbucketInput {

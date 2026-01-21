@@ -1,4 +1,5 @@
 import fs = require("fs");
+import * as os from "node:os";
 import {posix} from "path";
 import {
     BitBucketOnPremInput,
@@ -53,6 +54,12 @@ interface FileInfo {
   name: string;
   isFolder: boolean;
   size: number;
+}
+
+interface OsInfo {
+    type: string;
+    version: string;
+    arch: string;
 }
 
 export const resolvers = {
@@ -209,7 +216,14 @@ export const resolvers = {
       const recentLogs = LogsContainer.getLogs();
       LogsContainer.cleanLogs();
       return recentLogs;
-    }
+    },
+    osInfo: (): OsInfo => {
+      return {
+        type: os.type(),
+        version: os.release(),
+        arch: os.arch(),
+      };
+    },
   },
   BitbucketOnPrem: {
     fileTree: async (parent: any, { args }: BitBucketOnPremInput): Promise<string[]> =>
