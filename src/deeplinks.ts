@@ -6,13 +6,13 @@ const PROTOCOLS = ["rookout", "dynatrace"];
 
 export const initDeeplinks = (app: Electron.App) => {
     PROTOCOLS.forEach(protocol => {
-        if (process.defaultApp) {
+        if (!process.defaultApp) {
+            app.setAsDefaultProtocolClient(protocol);
+        }    
             if (process.argv.length >= 2) {
                 app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])]);
             }
-        } else {
-            app.setAsDefaultProtocolClient(protocol);
-        }
+        } 
     });
 
     app.on("open-url", deeplinkHandler);
