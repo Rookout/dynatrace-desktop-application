@@ -20,4 +20,4 @@ function configure() {
     return logsContainerAppender();
 }
 
-exports.configure = configure;
+export default { configure };

@@ -1,6 +1,6 @@
 import { ipcRenderer, IpcRendererEvent } from "electron";
-import _ = require("lodash");
-import net = require("net");
+import _ from "lodash";
+import net from "net";
 import { basename } from "path";
 import { Repository } from "./common/repository";
 import { notify } from "./exceptionManager";

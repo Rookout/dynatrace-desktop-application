@@ -1,5 +1,7 @@
-import fs = require("fs");
+import * as fs from "fs";
 import {posix} from "path";
+import { fileURLToPath } from "url";
+import { dirname, join as pathJoin } from "path";
 import {
     BitBucketOnPremInput,
     BitbucketOnPremRepoProps,
@@ -47,6 +49,19 @@ const GRAPHQL_INT_MAX = 2147483647;
 
 const logger = getLogger("api");
 const store = getStoreSafe();
+
+// Helper function to load package.json version
+const getPackageVersion = (): string => {
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const packagePath = pathJoin(__dirname, "../package.json");
+    const packageData = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
+    return packageData.version;
+  } catch (error) {
+    return "1.8.34";
+  }
+};
 
 interface FileInfo {
   path: string;
@@ -197,12 +212,17 @@ export const resolvers = {
     },
     appVersion: async (parent: any): Promise<string> => {
       if (process.env.development || process.env.headless_mode === "true") {
-        return require("../package.json")?.version;
-      } else if (require("@electron/remote")?.app) {
-        return require("@electron/remote").app.getVersion();
+        return getPackageVersion();
       } else {
-        // remote should exist. but sometimes it's undefined and breaks tests for some reason, so adding a temp fallback
-        return require("../package.json")?.version || "1.8.34";
+        try {
+          const remote = await import("@electron/remote");
+          if (remote?.app) {
+            return remote.app.getVersion();
+          }
+        } catch (error) {
+          // remote not available, fallback to package.json
+        }
+        return getPackageVersion();
       }
     },
     recentLogs: (parent: any): Log[] => {

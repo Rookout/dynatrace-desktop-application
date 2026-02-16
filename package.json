@@ -1,5 +1,6 @@
 {
   "name": "dynatrace-desktop-application",
+  "type": "module",
   "version": "1.0.15",
   "description": "dynatrace desktop application's site addon to support local files and folders",
   "main": "dist/index.js",

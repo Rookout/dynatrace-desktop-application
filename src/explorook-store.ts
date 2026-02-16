@@ -1,4 +1,5 @@
-import Store = require("electron-store");
+import Store from "electron-store";
+
 import MemStore from "./mem-store";
 
 export interface IStore {

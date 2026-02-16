@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
-import fs = require("fs");
-import _ = require("lodash");
+import fs from "fs";
+import _ from "lodash";
 import { Repository } from "./common/repository";
 import { getStoreSafe, IStore } from "./explorook-store";
 import { IndexWorker } from "./fsIndexer";

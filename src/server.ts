@@ -2,11 +2,13 @@ import {makeExecutableSchema} from "@graphql-tools/schema";
 import {ApolloServerPluginLandingPageDisabled} from "@apollo/server/plugin/disabled";
 import {ApolloServer} from "@apollo/server";
 import {expressMiddleware} from '@as-integrations/express5';
-import * as express from "express";
+import express from "express";
 import {readFileSync} from "fs";
 import {applyMiddleware} from "graphql-middleware";
 import * as http from "http";
 import {join} from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import {resolvers} from "./api";
 import {getCorsMiddleware} from "./cors";
 import {notify} from "./exceptionManager";
@@ -15,6 +17,9 @@ import {
     logMiddleware,
     resolveRepoFromId,
 } from "./middlewares";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export type onAddRepoRequestHandler = (fullpath: string, id?: string) => Promise<boolean>;
 

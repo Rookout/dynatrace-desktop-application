@@ -1,15 +1,15 @@
-import fs = require("fs");
+import fs from "fs";
 import * as igit from "isomorphic-git";
-import _ = require("lodash");
-import parseRepo = require("parse-repo");
-import path = require("path");
+import _ from "lodash";
+import parseRepo from "parse-repo";
+import path from "path";
 // for normalization of windows paths to linux style paths
-import slash = require("slash");
-import { Repository } from "./common/repository";
+import slash from "slash";
+import {Repository} from "./common/repository";
 import { notify } from "./exceptionManager";
 import {getLogger} from "./logger";
 import {getLibraryFolder} from "./utils";
-const uuidv4 = require("uuid/v4");
+import { v4 as uuidv4 } from "uuid";
 
 export const GIT_ROOT = path.join(getLibraryFolder(), "git_root");
 

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     webpack: {
         configure: {
           target: 'electron-renderer'

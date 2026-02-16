@@ -1,5 +1,5 @@
-import _ = require("lodash");
-import UrlAssembler = require("url-assembler");
+import _ from "lodash";
+import UrlAssembler from "url-assembler";
 import { notify } from "./exceptionManager";
 import { getStoreSafe } from "./explorook-store";
 import { getLogger } from "./logger";

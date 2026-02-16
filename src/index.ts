@@ -16,15 +16,20 @@ import {
 import * as log from "electron-log";
 import * as Store from "electron-store";
 import {autoUpdater, UpdateInfo} from "electron-updater";
-import fs = require("fs");
+import fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
 import {deeplinkHandler, initDeeplinks} from "./deeplinks";
 import { ExplorookStore } from "./explorook-store";
-const uuidv4 = require("uuid/v4");
-import AutoLaunch = require("auto-launch");
+import { v4 as uuidv4 } from "uuid";
+import AutoLaunch from "auto-launch";
 import fetch from "node-fetch";
 import {SemVer} from "semver";
 import { Logger, notify } from "./exceptionManager";
+
+// ESM __dirname helper
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 initElectronRemote();
 autoUpdater.logger = new Logger();

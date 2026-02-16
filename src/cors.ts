@@ -1,4 +1,5 @@
 import * as cors from "cors";
+import { CorsOptions } from "cors";
 import fetch from "node-fetch";
 
 

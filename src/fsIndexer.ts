@@ -1,8 +1,7 @@
 import { ipcRenderer } from "electron";
-import path = require("path");
-import slash = require("slash");
-const walk = require("walk");
-
+import path from "path";
+import slash from "slash";
+import walk from "walk";
 
 const defaultIgnores = [/\.git/, /\.svn/, /\.hg/, /CVS/, /\.DS_Store/,
     /site\-packages/, /node_modules/, /bower_components/, /\.venv/, /\.idea/,

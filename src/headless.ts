@@ -3,10 +3,11 @@ process.env.headless_mode = "true";
 
 import { repStore } from "./repoStore";
 import * as graphQlServer from "./server";
+import argsParser from "args-parser";
 
 // headless mode lets you run Explorook server without GUI
 
-const args = require("args-parser")(process.argv);
+const args = argsParser(process.argv);
 
 if (args.help || args.h) {
     console.log("add repository using --repo=<name>,<path> or -r=<name>,<path> or with the EXPLOROOK_REPO environment variable");

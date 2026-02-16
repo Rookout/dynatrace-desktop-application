@@ -1,10 +1,7 @@
 import {dialog} from "electron";
-
-const path = require("path");
+import path from "path";
 
 const PROTOCOL = "rookout";
-
-
 
 export const initDeeplinks = (app: Electron.App) => {
     if (process.defaultApp) {
