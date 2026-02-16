@@ -28,7 +28,7 @@ const onAddRepoRequest = async (fullpath: string, id?: string) => {
     ipcRenderer.send("track", "repo-add-request", { fullpath });
     if (!fullpath) {
         // will pop the menu for the user to choose repository
-        ipcRenderer.sendTo(mainWindowId, "pop-choose-repository");
+        ipcRenderer.send("pop-choose-repository-main");
         ipcRenderer.send("track", "repo-add-pop-choose-repo");
         return true;
     }
@@ -36,14 +36,14 @@ const onAddRepoRequest = async (fullpath: string, id?: string) => {
     // add repository
     const repoId = await repStore.add({ fullpath, repoName, id });
     // tell webview to refresh repos view
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send("repos-request-main", getRepos());
     ipcRenderer.send("track", "repo-add", { repoName, repoId });
     return true;
 };
 
 const onRemoveRepoRequest = async (repId: string) => {
   repStore.remove(repId);
-  ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+  ipcRenderer.send("repos-request-main", getRepos());
   return true;
 };
 
@@ -72,28 +72,28 @@ ipcRenderer.on("main-window-id", async (e: IpcRendererEvent, firstTimeLaunch: bo
 
 ipcRenderer.on("add-repo", (e: IpcRendererEvent, repo: Repository) => {
     repStore.add(repo).then(repoId => {
-        ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+        ipcRenderer.send("repos-request-main", getRepos());
         ipcRenderer.send("track", "repo-add", { repoName: repo.repoName, repoId });
     });
 });
 ipcRenderer.on("delete-repo", (e: IpcRendererEvent, repId: string) => {
     repStore.remove(repId);
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send("repos-request-main", getRepos());
 });
 ipcRenderer.on("edit-repo", (e: IpcRendererEvent, args: { id: string, repoName: string }) => {
     const { id, repoName } = args;
     repStore.update(id, repoName);
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send("repos-request-main", getRepos());
 });
 ipcRenderer.on("clear-all-repos", (e: IpcRendererEvent) => {
     const allRepos = _.map(repStore.getRepositories(), "id");
     _.forEach(allRepos, repo => {
         repStore.remove(repo);
     });
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send("repos-request-main", getRepos());
 });
 
-ipcRenderer.on("repos-request", (e: IpcRendererEvent) => ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos()));
+ipcRenderer.on("repos-request", (e: IpcRendererEvent) => ipcRenderer.send("repos-request-main", getRepos()));
 
 ipcRenderer.on("set-log-level", (e: IpcRendererEvent, newLogLevel: string) => {
     setLogLevel(newLogLevel);
