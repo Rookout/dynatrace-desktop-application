@@ -244,7 +244,8 @@ async function getLatestVersionName() {
   if (!response.ok) {
     throw new Error(`Error fetching latest version. Got: ${response.status} status with body: ${await response.text()}`);
   }
-  return (await response.json()).name;
+  const data = await response.json() as { name: string };
+  return data.name;
 }
 
 function displayWindowHiddenNotification() {

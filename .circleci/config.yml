@@ -20,7 +20,7 @@ jobs:
       - checkout
       - node/install:
           install-yarn: true
-          node-version: "22.14.0"
+          node-version: "24.13.0"
       - restore_cache:
           key: homebrew-cache-{{ arch }}-{{ .Environment.CACHE_VERSION }}-{{ checksum ".circleci/config.yml" }}
       - run:
@@ -102,7 +102,7 @@ jobs:
           command: sh ./validate_version.sh
   publish_release_notes:
     docker:
-      - image: node:18.17.1
+      - image: node:24.13.0
     steps:
       - checkout
       - run:
