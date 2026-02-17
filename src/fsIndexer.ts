@@ -1,4 +1,6 @@
 import { ipcRenderer } from "electron";
+
+import {IpcChannel} from "./typings";
 import path = require("path");
 import slash = require("slash");
 const walk = require("walk");
@@ -75,8 +77,8 @@ export class IndexWorker {
         stats.forEach((count, ext) => {
             str += `${ext}: ${count}\n`;
         });
-        ipcRenderer.send("track", "index-limit-reached", { stats: str });
-    }
+        ipcRenderer.send(IpcChannel.TRACK, "index-limit-reached", { stats: str });
+}
 
     public deleteIndex() {
         // stops indexing job if it's running

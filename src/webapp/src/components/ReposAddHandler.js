@@ -3,6 +3,8 @@ import { ipcRenderer } from 'electron'
 import path from 'path'
 import { app, dialog, getCurrentWindow } from '@electron/remote'
 
+import {IpcChannel} from "../../../typings";
+
 
 
 
@@ -11,10 +13,10 @@ export const ReposAddHandler = () => {
 
 
     useEffect(() => {
-        ipcRenderer.on('pop-choose-repository', () => {
+        ipcRenderer.on(IpcChannel.POP_CHOOSE_REPOSITORY, () => {
             onPopDialogRequested()
         })
-        ipcRenderer.sendTo(window.indexWorkerId, 'repos-request')
+        ipcRenderer.send(IpcChannel.SPECIFIC_WORKER_INDEX_ID, {targetId: window.indexWorkerId, ipcChannel: IpcChannel.REPOS_REQUEST})
     }, [])
 
     const onPopDialogRequested = async () => {
@@ -45,7 +47,7 @@ export const ReposAddHandler = () => {
             const folder = filePaths[i]
             const repoName = path.basename(folder)
             const newRepo = { repoName, fullpath: folder }
-            ipcRenderer.sendTo(window.indexWorkerId, 'add-repo', newRepo)
+            ipcRenderer.send(IpcChannel.SPECIFIC_WORKER_INDEX_ID, {targetId: window.indexWorkerId, ipcChannel: IpcChannel.APP_REPO, payload: [newRepo]})
         }
     }
 

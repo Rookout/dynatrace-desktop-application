@@ -6,6 +6,7 @@ import { getStoreSafe, IStore } from "./explorook-store";
 import { IndexWorker } from "./fsIndexer";
 import { getRepoId } from "./git";
 import { getLogger } from "./logger";
+import {IpcChannel} from "./typings";
 
 const logger = getLogger("repoStore");
 
@@ -123,7 +124,7 @@ class RepoStore {
         const removed = _.remove(this.repos, (r) => r.id === id);
         removed.forEach((r) => {
             r.indexer.deleteIndex();
-            ipcRenderer.send("track", "repo-remove", { repoName: r.repoName, repoId: r.id });
+            ipcRenderer.send(IpcChannel.TRACK, "repo-remove", { repoName: r.repoName, repoId: r.id });
         });
         if (removed) {
             this.save();

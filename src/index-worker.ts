@@ -7,6 +7,7 @@ import { notify } from "./exceptionManager";
 import {setLogLevel} from "./logger";
 import { repStore } from "./repoStore";
 import * as graphQlServer from "./server";
+import {IpcChannel} from "./typings";
 
 let mainWindowId = -1;
 
@@ -25,29 +26,29 @@ const isPortInUse = (port: number): Promise<boolean> => new Promise<boolean>((re
 });
 
 const onAddRepoRequest = async (fullpath: string, id?: string) => {
-    ipcRenderer.send("track", "repo-add-request", { fullpath });
+    ipcRenderer.send(IpcChannel.TRACK, "repo-add-request", { fullpath });
     if (!fullpath) {
         // will pop the menu for the user to choose repository
-        ipcRenderer.sendTo(mainWindowId, "pop-choose-repository");
-        ipcRenderer.send("track", "repo-add-pop-choose-repo");
+        ipcRenderer.send(IpcChannel.POP_CHOOSE_REPOSITORY_MAIN);
+        ipcRenderer.send(IpcChannel.TRACK, "repo-add-pop-choose-repo");
         return true;
     }
     const repoName = basename(fullpath);
     // add repository
     const repoId = await repStore.add({ fullpath, repoName, id });
     // tell webview to refresh repos view
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
-    ipcRenderer.send("track", "repo-add", { repoName, repoId });
+    ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos());
+    ipcRenderer.send(IpcChannel.TRACK, "repo-add", { repoName, repoId });
     return true;
 };
 
 const onRemoveRepoRequest = async (repId: string) => {
   repStore.remove(repId);
-  ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+  ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos());
   return true;
 };
 
-ipcRenderer.on("main-window-id", async (e: IpcRendererEvent, firstTimeLaunch: boolean, id: number) => {
+ipcRenderer.on(IpcChannel.MAIN_WINDOW_ID, async (e: IpcRendererEvent, firstTimeLaunch: boolean, id: number) => {
     mainWindowId = id;
     const port = 44512;
     try {
@@ -55,7 +56,7 @@ ipcRenderer.on("main-window-id", async (e: IpcRendererEvent, firstTimeLaunch: bo
         if (portInUse) {
             throw new Error(`port ${port} in use`);
         }
-        const userId: string = ipcRenderer.sendSync("get-user-id");
+        const userId: string = ipcRenderer.sendSync(IpcChannel.GET_USER_ID);
         await graphQlServer.start({
             userId,
             port,
@@ -66,38 +67,38 @@ ipcRenderer.on("main-window-id", async (e: IpcRendererEvent, firstTimeLaunch: bo
     } catch (err) {
         console.error(err);
         notify("Failed to start local server", { metaData: { err }});
-        ipcRenderer.send("start-server-error", _.toString(err));
+        ipcRenderer.send(IpcChannel.START_SERVER_ERROR, _.toString(err));
     }
 });
 
-ipcRenderer.on("add-repo", (e: IpcRendererEvent, repo: Repository) => {
+ipcRenderer.on(IpcChannel.APP_REPO, (e: IpcRendererEvent, repo: Repository) => {
     repStore.add(repo).then(repoId => {
-        ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
-        ipcRenderer.send("track", "repo-add", { repoName: repo.repoName, repoId });
+        ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos());
+        ipcRenderer.send(IpcChannel.TRACK, "repo-add", { repoName: repo.repoName, repoId });
     });
 });
-ipcRenderer.on("delete-repo", (e: IpcRendererEvent, repId: string) => {
+ipcRenderer.on(IpcChannel.DELETE_REPO, (e: IpcRendererEvent, repId: string) => {
     repStore.remove(repId);
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos());
 });
-ipcRenderer.on("edit-repo", (e: IpcRendererEvent, args: { id: string, repoName: string }) => {
+ipcRenderer.on(IpcChannel.EDIT_REPO, (e: IpcRendererEvent, args: { id: string, repoName: string }) => {
     const { id, repoName } = args;
     repStore.update(id, repoName);
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos());
 });
-ipcRenderer.on("clear-all-repos", (e: IpcRendererEvent) => {
+ipcRenderer.on(IpcChannel.CLEAR_ALL_REPOS, (e: IpcRendererEvent) => {
     const allRepos = _.map(repStore.getRepositories(), "id");
     _.forEach(allRepos, repo => {
         repStore.remove(repo);
     });
-    ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());
+    ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos());
 });
 
-ipcRenderer.on("repos-request", (e: IpcRendererEvent) => ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos()));
+ipcRenderer.on(IpcChannel.REPOS_REQUEST, (e: IpcRendererEvent) => ipcRenderer.send(IpcChannel.REPOS_REQUEST_MAIN, getRepos()));
 
-ipcRenderer.on("set-log-level", (e: IpcRendererEvent, newLogLevel: string) => {
+ipcRenderer.on(IpcChannel.SET_LOG_LEVEL, (e: IpcRendererEvent, newLogLevel: string) => {
     setLogLevel(newLogLevel);
 });
 
-ipcRenderer.send("index-worker-up");
-ipcRenderer.send("exception-manager-is-enabled-req");
+ipcRenderer.send(IpcChannel.INDEX_WORKER_UP);
+ipcRenderer.send(IpcChannel.EXCEPTION_MANAGER_IS_ENABLED_REQ);

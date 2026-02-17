@@ -7,6 +7,8 @@ import Footer from './components/Footer'
 import { EmptyState } from './components/EmptyState'
 import {ReposAddHandler} from "./components/ReposAddHandler";
 
+import {IpcChannel} from "../../typings";
+
 
 export const App = () => {
   const [loading, setLoading] = useState(true)
@@ -14,11 +16,11 @@ export const App = () => {
   useEffect(() => {
     // "indexer-worker-id" event should be subscribed to BEFORE "app-window-up" event
     // because this is the event that will trigger it
-    ipcRenderer.on('indexer-worker-id', (e, id) => {
+    ipcRenderer.on(IpcChannel.INDEXER_WORKER_ID, (e, id) => {
       window.indexWorkerId = id
       setLoading(false)
     })
-    ipcRenderer.send('app-window-up')
+    ipcRenderer.send(IpcChannel.APP_WINDOWS_UP)
   }, [])
 
   if (loading) {
