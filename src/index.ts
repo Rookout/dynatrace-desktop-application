@@ -1,30 +1,21 @@
-import {
-  enable as remoteEnable,
-  initialize as initElectronRemote
-} from "@electron/remote/main";
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  IpcMainEvent,
-  Menu,
-  nativeImage,
-  nativeTheme,
-  Notification,
-  Tray
-} from "electron";
+import {webContents} from "@electron/remote";
+import {enable as remoteEnable, initialize as initElectronRemote} from "@electron/remote/main";
+import {app, BrowserWindow, ipcMain, IpcMainEvent, Menu, nativeImage, nativeTheme, Notification, Tray} from "electron";
 import * as log from "electron-log";
 import * as Store from "electron-store";
 import {autoUpdater, UpdateInfo} from "electron-updater";
-import fs = require("fs");
-import * as path from "path";
-import {deeplinkHandler, initDeeplinks} from "./deeplinks";
-import { ExplorookStore } from "./explorook-store";
-const uuidv4 = require("uuid/v4");
-import AutoLaunch = require("auto-launch");
 import fetch from "node-fetch";
+import * as path from "path";
 import {SemVer} from "semver";
-import { Logger, notify } from "./exceptionManager";
+import {deeplinkHandler, initDeeplinks} from "./deeplinks";
+import {Logger, notify} from "./exceptionManager";
+import {ExplorookStore} from "./explorook-store";
+import {IpcChannel} from "./typings";
+import AutoLaunch = require("auto-launch");
+import fs = require("fs");
+
+const uuidv4 = require("uuid/v4");
+
 
 initElectronRemote();
 autoUpdater.logger = new Logger();
@@ -107,37 +98,45 @@ function registerIpc() {
   al = new AutoLaunch(alConfig);
   linuxAutoLaunchPatch();
   firstTimeAutoLaunch();
-  ipcMain.on("pop-choose-repository-main", () => {
-      mainWindow.webContents.send("pop-choose-repository");
+
+  ipcMain.on(IpcChannel.SPECIFIC_WORKER_INDEX_ID, (e, { targetId, ipcChannel, payload }) => {
+      const target = webContents.fromId(Number(targetId));
+      if (target && !target.isDestroyed()) {
+          target.send(ipcChannel, ...payload);
+      }
   });
-  ipcMain.on("repos-request-main", (_, repos) => {
-      mainWindow.webContents.send("refresh-repos", repos);
+
+  ipcMain.on(IpcChannel.POP_CHOOSE_REPOSITORY_MAIN, () => {
+      mainWindow.webContents.send(IpcChannel.POP_CHOOSE_REPOSITORY);
   });
-  ipcMain.on("hidden", displayWindowHiddenNotification);
-  ipcMain.on("start-server-error", (e: IpcMainEvent, err: any) => {
+  ipcMain.on(IpcChannel.REPOS_REQUEST_MAIN, (_, repos) => {
+      mainWindow.webContents.send(IpcChannel.REFRESH_REPOS, repos);
+  });
+  ipcMain.on(IpcChannel.HIDDEN, displayWindowHiddenNotification);
+  ipcMain.on(IpcChannel.START_SERVER_ERROR, (e: IpcMainEvent, err: any) => {
     displayNotification("Rookout Desktop App", `App failed to start local server: ${err}`);
   });
-  ipcMain.on("get-user-id", (e: IpcMainEvent) => e.returnValue = userId);
-  ipcMain.on("get-platform", (e: IpcMainEvent) => e.returnValue = process.platform.toString());
-  ipcMain.on("force-exit", (e: IpcMainEvent) => quitApplication());
-  ipcMain.on("inspect-all", () => {
+  ipcMain.on(IpcChannel.GET_USER_ID, (e: IpcMainEvent) => e.returnValue = userId);
+  ipcMain.on(IpcChannel.GET_PLATFORM, (e: IpcMainEvent) => e.returnValue = process.platform.toString());
+  ipcMain.on(IpcChannel.FORCE_EXIT, (e: IpcMainEvent) => quitApplication());
+  ipcMain.on(IpcChannel.INSPECT_ALL, () => {
     mainWindow.webContents.openDevTools();
     indexWorker.webContents.openDevTools();
   });
-  ipcMain.on("auto-launch-is-enabled-req", async (e: IpcMainEvent) => {
+  ipcMain.on(IpcChannel.AUTO_LAUNCH_IS_ENABLED_REQ, async (e: IpcMainEvent) => {
     // inspecting al.isEnabled prompts permissions dialog on macOS
     // so we prevent it from happening on readonly volume
     const enabled = !(await isReadonlyVolume()) && await al.isEnabled();
-    e.sender.send("auto-launch-is-enabled-changed", enabled);
+    e.sender.send(IpcChannel.AUTO_LAUNCH_IS_ENABLED_CHANGED, enabled);
   });
 
-  ipcMain.on("auto-launch-set", (e: IpcMainEvent, enable: boolean) => {
+  ipcMain.on(IpcChannel.AUTO_LAUNCH_SET, (e: IpcMainEvent, enable: boolean) => {
     if (enable) {
       store.set("linux-start-with-os", true);
-      al.enable().then(() => e.sender.send("auto-launch-is-enabled-changed", true));
+      al.enable().then(() => e.sender.send(IpcChannel.AUTO_LAUNCH_IS_ENABLED_CHANGED, true));
     } else {
       store.set("linux-start-with-os", false);
-      al.disable().then(() => e.sender.send("auto-launch-is-enabled-changed", false));
+      al.disable().then(() => e.sender.send(IpcChannel.AUTO_LAUNCH_IS_ENABLED_CHANGED, false));
     }
   });
 }
@@ -286,7 +285,7 @@ function createWindows() {
     webPreferences: { nodeIntegration: true, contextIsolation: false, sandbox: false }
   });
   remoteEnable(indexWorker.webContents);
-  ipcMain.on("index-worker-up", (e: IpcMainEvent) => {
+  ipcMain.on(IpcChannel.INDEX_WORKER_UP, (e: IpcMainEvent) => {
     createMainWindow(indexWorker, !firstTimeLaunch);
   });
   indexWorker.loadFile(path.join(__dirname, "index-worker.html")).finally(() => {
@@ -297,7 +296,7 @@ function createWindows() {
 }
 
 function startGraphqlServer() {
-  indexWorker.webContents.send("main-window-id", firstTimeLaunch, mainWindow.webContents.id);
+  indexWorker.webContents.send(IpcChannel.MAIN_WINDOW_ID, firstTimeLaunch, mainWindow.webContents.id);
 }
 
 function createMainWindow(indexWorkerWindow: BrowserWindow, hidden: boolean = false) {
@@ -314,8 +313,8 @@ function createMainWindow(indexWorkerWindow: BrowserWindow, hidden: boolean = fa
   remoteEnable(mainWindow.webContents);
   startGraphqlServer();
 
-  ipcMain.on("app-window-up", (ev: IpcMainEvent) => {
-    ev.sender.send("indexer-worker-id", indexWorker.id);
+  ipcMain.on(IpcChannel.APP_WINDOWS_UP, (ev: IpcMainEvent) => {
+    ev.sender.send(IpcChannel.INDEXER_WORKER_ID, indexWorker.id);
     if (hidden && process.platform === "darwin") {
       app.dock.hide();
     }

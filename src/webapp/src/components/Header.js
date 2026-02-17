@@ -6,6 +6,8 @@ import { Menu, MenuItem } from "@material-ui/core";
 import { closeWindow } from "../utils";
 import * as Store from "electron-store";
 
+import {IpcChannel} from "../../../typings";
+
 const DYNATRACE_DESKTOP_APPLICATION_VERSION = app.getVersion();
 
 export const Header = () => {
@@ -19,18 +21,18 @@ export const Header = () => {
     };
 
     const startDebug = e => {
-        ipcRenderer.send("inspect-all");
+        ipcRenderer.send(IpcChannel.INSPECT_ALL);
         setOpen(false);
     };
 
     const store = new Store({ name: "explorook" });
     const isLogLevelDebug = store.get("logLevel", "debug") === "debug";
     const setLogLever = isDebug => {
-        ipcRenderer.sendTo(window.indexWorkerId, "set-log-level", isDebug ? "debug" : "error")
+        ipcRenderer.send(IpcChannel.SPECIFIC_WORKER_INDEX_ID, {targetId: window.indexWorkerId, ipcChannel: IpcChannel.SET_LOG_LEVEL, payload: [isDebug ? "debug" : "error"]})
         setOpen(false);
     }
     const clearAllRepos = () => {
-        ipcRenderer.sendTo(window.indexWorkerId, "clear-all-repos");
+        ipcRenderer.send(IpcChannel.SPECIFIC_WORKER_INDEX_ID, {targetId: window.indexWorkerId, ipcChannel: IpcChannel.CLEAR_ALL_REPOS});
         setOpen(false);
     }
 
