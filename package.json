@@ -128,7 +128,7 @@
     "express": "5.2.1",
     "graphql": "^16.11.0",
     "isomorphic-git": "^1.8.2",
-    "lodash": "^4.17.23",
+    "lodash": "^4.17.15",
     "log4js": "6.7.1",
     "parse-repo": "^1.0.4",
     "postinstall-postinstall": "^2.1.0",
@@ -136,6 +136,7 @@
     "slash": "3.0.0",
     "url-assembler": "^2.1.1",
     "uuid": "^3.2.1",
+    "validator": "^13.6.0",
     "walk": "^2.3.13"
   },
   "resolutions": {
@@ -143,6 +144,7 @@
     "graphql-constraint-directive/validator": "^13.6.0",
     "sha.js": "^2.4.12",
     "ajv": "^8.18.0",
+    "ajv-keywords": "^5.0.0",
     "js-yaml": "^4.1.1",
     "qs": "^6.14.2"
   }
