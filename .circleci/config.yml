@@ -40,7 +40,7 @@ jobs:
           name: Install Dependencies
           command: |
             # download custom jsign to sign PE
-            curl -fsSL https://get.rookout.com/jsign-rookout.jar --output jsign.jar
+            cp ./ci/jsign-2.1.jar jsign.jar
             # install electron main window dependencies
             yarn
             # build typescript code
