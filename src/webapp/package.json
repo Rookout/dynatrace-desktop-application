@@ -19,12 +19,11 @@
     "**/set-value": "^3.0.1",
     "**/adjust-sourcemap-loader/object-path": "^0.11.5",
     "react-scripts/semver": "^7.5.2",
-    "ajv": "^8.18.0",
-    "ajv-keywords": "^5.0.0",
     "sha.js": "^2.4.12",
+    "lodash": "^4.17.23",
+    "diff": "^4.0.4",
     "cross-spawn": "^7.0.5",
-    "diff": "^4.0.2",
-    "lodash": "^4.17.23"
+    "@babel/runtime": "^7.26.10"
   },
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider craco start",
