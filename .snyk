@@ -5,7 +5,7 @@ ignore:
   SNYK-JS-AJV-15274295:
     - '*':
         reason: >-
-          Not exploitable: conf creates Ajv without , and app Store usage does
+          Not exploitable: conf creates Ajv without data and app Store usage does
           not pass schema (only name/watch), so vulnerable path is unreachable.
         expires: 2026-08-23T00:00:00.000Z
         created: 2026-02-23T19:40:25.431Z
