@@ -8,7 +8,7 @@ import {applyMiddleware} from "graphql-middleware";
 import * as http from "http";
 import {join} from "path";
 import {resolvers} from "./api";
-import {getCorsMiddleware} from "./cors";
+import {getCorsMiddleware, hostAllowlistMiddleware} from "./cors";
 import {notify} from "./exceptionManager";
 import {
     filterDirTraversal,
@@ -64,6 +64,7 @@ export const start = async (options: StartOptions) => {
     await apolloServer.start();
 
     app.use('/',
+        hostAllowlistMiddleware,
         getCorsMiddleware(),
         express.json(),
         expressMiddleware(apolloServer, {

@@ -1,5 +1,6 @@
 import * as cors from "cors";
 import fetch from "node-fetch";
+import type {Request, Response, NextFunction} from "express";
 
 
 const LOCALHOST_ORIGIN = "http://localhost:3000";
@@ -42,5 +43,21 @@ const corsOptionsDelegate = async (req: cors.CorsRequest, callback: (err: Error 
 
 export const getCorsMiddleware = () => {
     return cors(corsOptionsDelegate);
+};
+
+const ALLOWED_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
+
+export const hostAllowlistMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const hostHeader = req.headers.host;
+    if (!hostHeader) {
+        res.status(400).send("Missing Host header");
+        return;
+    }
+    const host = hostHeader.replace(/:\d+$/, "");
+    if (!ALLOWED_HOSTS.has(host)) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+    next();
 };
 
