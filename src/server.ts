@@ -8,13 +8,14 @@ import {applyMiddleware} from "graphql-middleware";
 import * as http from "http";
 import {join} from "path";
 import {resolvers} from "./api";
-import {getCorsMiddleware, hostAllowlistMiddleware} from "./cors";
+import {getCorsMiddleware} from "./middleware/cors";
 import {notify} from "./exceptionManager";
 import {
     filterDirTraversal,
     logMiddleware,
     resolveRepoFromId,
 } from "./middlewares";
+import {allowedHostsMiddleware} from "./middleware/allowedHosts";
 
 export type onAddRepoRequestHandler = (fullpath: string, id?: string) => Promise<boolean>;
 
@@ -64,7 +65,7 @@ export const start = async (options: StartOptions) => {
     await apolloServer.start();
 
     app.use('/',
-        hostAllowlistMiddleware,
+        allowedHostsMiddleware,
         getCorsMiddleware(),
         express.json(),
         expressMiddleware(apolloServer, {
