@@ -1,6 +1,6 @@
 import { ipcRenderer, IpcRendererEvent } from "electron";
-import _ = require("lodash");
-import net = require("net");
+import _ from "lodash";
+import net from "net";
 import { basename } from "path";
 import { Repository } from "./common/repository";
 import { notify } from "./exceptionManager";
@@ -87,7 +87,7 @@ ipcRenderer.on("edit-repo", (e: IpcRendererEvent, args: { id: string, repoName: 
 });
 ipcRenderer.on("clear-all-repos", (e: IpcRendererEvent) => {
     const allRepos = _.map(repStore.getRepositories(), "id");
-    _.forEach(allRepos, repo => {
+    _.forEach(allRepos, (repo: string) => {
         repStore.remove(repo);
     });
     ipcRenderer.sendTo(mainWindowId, "refresh-repos", getRepos());

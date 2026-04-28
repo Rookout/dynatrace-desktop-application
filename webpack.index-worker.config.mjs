@@ -1,4 +1,7 @@
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const config = {
   mode: 'development',
@@ -44,4 +47,4 @@ if (!process.env.development) {
   config.mode = "production";
 }
 
-module.exports = config;
+export default config;

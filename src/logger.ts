@@ -1,12 +1,12 @@
-import _ = require("lodash");
-import {Logger} from "log4js";
+import _ from "lodash";
+import log4js, {Logger} from "log4js";
+import path from "path";
 import {getStoreSafe} from "./explorook-store";
+import configure from "./logsContainerAppender";
 import {getLibraryFolder} from "./utils";
 
 const LOG_LEVEL_KEY = "logLevel";
 
-const path = require("path");
-const log4js = require("log4js");
 const loggers: { [key: string]: Logger } = {};
 
 const store = getStoreSafe();
@@ -17,13 +17,12 @@ if (!logLevel) {
 }
 
 const getLogFileLocation = () => path.join(getLibraryFolder(), "dynatrace.log");
-const customAppender = require("./logsContainerAppender");
 
 log4js.configure({
     appenders: {
         "file": {type: "file", filename: getLogFileLocation()},
         "logs-container": {
-            type: customAppender,
+            type: { configure },
         }
     },
     categories: {
@@ -33,7 +32,7 @@ log4js.configure({
 
 export const setLogLevel = (newLogLevel: string) => {
     store.set(LOG_LEVEL_KEY, newLogLevel);
-    _.forEach(loggers, logger => {
+    _.forEach(loggers, (logger: Logger) => {
         logger.level = newLogLevel;
     });
 };

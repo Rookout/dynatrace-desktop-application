@@ -1,30 +1,17 @@
-import {
-  enable as remoteEnable,
-  initialize as initElectronRemote
-} from "@electron/remote/main";
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  IpcMainEvent,
-  Menu,
-  nativeImage,
-  nativeTheme,
-  Notification,
-  Tray
-} from "electron";
+import {enable as remoteEnable, initialize as initElectronRemote} from "@electron/remote/main";
+import AutoLaunch from "auto-launch";
+import {app, BrowserWindow, ipcMain, IpcMainEvent, Menu, nativeImage, nativeTheme, Notification, Tray} from "electron";
 import * as log from "electron-log";
-import * as Store from "electron-store";
+import Store from "electron-store";
 import {autoUpdater, UpdateInfo} from "electron-updater";
-import fs = require("fs");
-import * as path from "path";
-import {deeplinkHandler, initDeeplinks} from "./deeplinks";
-import { ExplorookStore } from "./explorook-store";
-const uuidv4 = require("uuid/v4");
-import AutoLaunch = require("auto-launch");
+import fs from "fs";
 import fetch from "node-fetch";
+import * as path from "path";
 import {SemVer} from "semver";
-import { Logger, notify } from "./exceptionManager";
+import {v4 as uuidv4} from "uuid";
+import {deeplinkHandler, initDeeplinks} from "./deeplinks";
+import {Logger, notify} from "./exceptionManager";
+import {ExplorookStore} from "./explorook-store";
 
 initElectronRemote();
 autoUpdater.logger = new Logger();

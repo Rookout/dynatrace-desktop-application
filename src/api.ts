@@ -1,6 +1,7 @@
-import fs = require("fs");
+import fs from "fs";
 import * as os from "node:os";
 import {posix} from "path";
+import pkg from "../package.json";
 import {
     BitBucketOnPremInput,
     BitbucketOnPremRepoProps,
@@ -30,9 +31,7 @@ import {
 import {Repository} from "./common/repository";
 import {notify, USER_EMAIL_KEY} from "./exceptionManager";
 import {getStoreSafe} from "./explorook-store";
-import {
-  getLastCommitDescription as getLastCommitDescription,
-} from "./git";
+import {getLastCommitDescription as getLastCommitDescription,} from "./git";
 import Log from "./logData";
 import {getLogger} from "./logger";
 import LogsContainer from "./logsContainer";
@@ -204,13 +203,17 @@ export const resolvers = {
     },
     appVersion: async (parent: any): Promise<string> => {
       if (process.env.development || process.env.headless_mode === "true") {
-        return require("../package.json")?.version;
-      } else if (require("@electron/remote")?.app) {
-        return require("@electron/remote").app.getVersion();
-      } else {
-        // remote should exist. but sometimes it's undefined and breaks tests for some reason, so adding a temp fallback
-        return require("../package.json")?.version || "1.8.34";
+        return pkg?.version;
       }
+      try {
+        const remote = await import("@electron/remote");
+        if (remote?.app) {
+          return remote.app.getVersion();
+        }
+      } catch {
+        // not running inside Electron, fall through to package.json version
+      }
+      return pkg?.version || "1.8.34";
     },
     recentLogs: (parent: any): Log[] => {
       const recentLogs = LogsContainer.getLogs();

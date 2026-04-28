@@ -1,10 +1,10 @@
 // See: https://medium.com/@TwitterArchiveEraser/notarize-electron-apps-7a5f988406db
 
-const fs = require('fs');
-const path = require('path');
-const electronNotarize = require('@electron/notarize');
+import fs from 'fs';
+import path from 'path';
+import * as electronNotarize from '@electron/notarize';
 
-module.exports = async function (params) {
+export default async function (params) {
     // Only notarize the app on Mac OS only.
     if (process.platform !== 'darwin') {
         console.log("MAC Notarization Hook: only running on MAC - skipping")
@@ -41,4 +41,4 @@ module.exports = async function (params) {
     }
 
     console.log(`Done notarizing app at ${appPath}`);
-};
+}

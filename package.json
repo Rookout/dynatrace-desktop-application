@@ -4,11 +4,11 @@
   "description": "dynatrace desktop application's site addon to support local files and folders",
   "main": "dist/index.js",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.main.config.js && cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.index-worker.config.js",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.main.config.mjs && cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.index-worker.config.mjs",
     "postbuild": "copyfiles index-worker.html ./dist/",
     "package-linux": "electron-builder --linux APPIMAGE",
     "package-windows": "electron-builder --win",
-    "build-headless": "tsc",
+    "build-headless": "tsc -p tsconfig.headless.json",
     "dist": "electron-builder",
     "build-packages-all-distributions": "cross-env NODE_OPTIONS=--openssl-legacy-provider ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder --mac --win --linux --arm64 --x64 -p always",
     "lint": "tslint -c tslint.json -p tsconfig.json",
@@ -20,7 +20,7 @@
     "productName": "Dynatrace Desktop App",
     "extends": null,
     "appId": "com.rookout.dynatrace-desktop-application",
-    "afterSign": "./afterSignHook.js",
+    "afterSign": "./afterSignHook.mjs",
     "publish": [
       {
         "provider": "github",
@@ -68,7 +68,7 @@
         "Dynatrace Israel LTD"
       ],
       "target": "NSIS",
-      "sign": "./sign_windows.js",
+      "sign": "./sign_windows.mjs",
       "icon": "assets/icons/logo@512x512.png"
     }
   },
@@ -135,7 +135,7 @@
     "semver": "7.5.4",
     "slash": "3.0.0",
     "url-assembler": "^2.1.1",
-    "uuid": "^3.2.1",
+    "uuid": "^9.0.0",
     "validator": "^13.6.0",
     "walk": "^2.3.13"
   },

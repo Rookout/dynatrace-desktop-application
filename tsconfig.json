@@ -10,16 +10,17 @@
       "dom.iterable",
       "scripthost",
     ],
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "node_modules/*"
-      ]
+      "graphql-middleware": ["./node_modules/graphql-middleware/dist/index.d.ts"]
     }
   },
   "include": [
