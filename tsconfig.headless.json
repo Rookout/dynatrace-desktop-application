@@ -4,7 +4,11 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "electron-store": ["./node_modules/electron-store/index.d.ts"],
+      "conf": ["./node_modules/conf/dist/source/index.d.ts"]
+    }
   },
   "include": [
     "src/global.d.ts",
