@@ -18,7 +18,7 @@ export default async function (params) {
 
     // Skip notarization if code signing was disabled (e.g. local builds)
     if (process.env.CSC_IDENTITY_AUTO_DISCOVERY === 'false' || !process.env.APPLE_DEV_USER) {
-        console.log('Skipping identity signing');
+        console.log('Skipping notarization - no identity signing');
         return;
     }
 
