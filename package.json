@@ -54,7 +54,9 @@
         "x-scheme-handler/dynatrace"
       ],
       "desktop": {
-        "exec": "rookout %u"
+        "entry": {
+          "Exec": "rookout %u"
+        }
       }
     },
     "dmg": {
@@ -64,12 +66,12 @@
       "icon": "assets/icons/mac/icons.icns"
     },
     "win": {
-      "publisherName": [
-        "Dynatrace Israel LTD"
-      ],
       "target": "NSIS",
-      "sign": "./sign_windows.mjs",
-      "icon": "assets/icons/logo@512x512.png"
+      "icon": "assets/icons/logo@512x512.png",
+      "signtoolOptions": {
+        "sign": "./sign_windows.mjs",
+        "publisherName": "Dynatrace Israel LTD"
+      }
     }
   },
   "repository": "https://github.com/rookout/dynatrace-desktop-application",
