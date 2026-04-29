@@ -11,7 +11,7 @@ import {resolvers} from "./api";
 import {notify} from "./exceptionManager";
 import {allowedHostsMiddleware} from "./middleware/allowedHosts";
 import {getCorsMiddleware} from "./middleware/cors";
-import {filterDirTraversal, logMiddleware, resolveRepoFromId,} from "./middlewares";
+import {filterDirTraversal, logMiddleware, resolveRepoFromId} from "./middlewares";
 
 export type onAddRepoRequestHandler = (fullpath: string, id?: string) => Promise<boolean>;
 

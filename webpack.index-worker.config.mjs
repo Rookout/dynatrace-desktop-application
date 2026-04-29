@@ -39,7 +39,8 @@ const config = {
   },
   output: {
     filename: 'index-worker.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: './'
   }
 };
 
