@@ -1,10 +1,10 @@
 // See: https://medium.com/@TwitterArchiveEraser/notarize-electron-apps-7a5f988406db
 
-const fs = require('fs');
-const path = require('path');
-const electronNotarize = require('@electron/notarize');
+import fs from 'fs';
+import path from 'path';
+import * as electronNotarize from '@electron/notarize';
 
-module.exports = async function (params) {
+export default async function (params) {
     // Only notarize the app on Mac OS only.
     if (process.platform !== 'darwin') {
         console.log("MAC Notarization Hook: only running on MAC - skipping")
@@ -15,6 +15,12 @@ module.exports = async function (params) {
         return;
     }
     console.log('afterSign hook triggered');
+
+    // Skip notarization if code signing was disabled (e.g. local builds)
+    if (process.env.CSC_IDENTITY_AUTO_DISCOVERY === 'false' || !process.env.APPLE_DEV_USER) {
+        console.log('Skipping notarization - no identity signing');
+        return;
+    }
 
     // This will prevent using the legacy altool to notarize (will be shut down by 2023)
     const tool = "notarytool";
@@ -41,4 +47,4 @@ module.exports = async function (params) {
     }
 
     console.log(`Done notarizing app at ${appPath}`);
-};
+}

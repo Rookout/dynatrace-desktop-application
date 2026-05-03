@@ -1,21 +1,17 @@
-import {makeExecutableSchema} from "@graphql-tools/schema";
-import {ApolloServerPluginLandingPageDisabled} from "@apollo/server/plugin/disabled";
 import {ApolloServer} from "@apollo/server";
+import {ApolloServerPluginLandingPageDisabled} from "@apollo/server/plugin/disabled";
 import {expressMiddleware} from '@as-integrations/express5';
-import * as express from "express";
+import {makeExecutableSchema} from "@graphql-tools/schema";
+import express from "express";
 import {readFileSync} from "fs";
 import {applyMiddleware} from "graphql-middleware";
 import * as http from "http";
 import {join} from "path";
 import {resolvers} from "./api";
-import {getCorsMiddleware} from "./middleware/cors";
 import {notify} from "./exceptionManager";
-import {
-    filterDirTraversal,
-    logMiddleware,
-    resolveRepoFromId,
-} from "./middlewares";
 import {allowedHostsMiddleware} from "./middleware/allowedHosts";
+import {getCorsMiddleware} from "./middleware/cors";
+import {filterDirTraversal, logMiddleware, resolveRepoFromId} from "./middlewares";
 
 export type onAddRepoRequestHandler = (fullpath: string, id?: string) => Promise<boolean>;
 
@@ -74,8 +70,7 @@ export const start = async (options: StartOptions) => {
                 onRemoveRepoRequest: settings.onRemoveRepoRequest
             })
         })
-    )
-
+    );
 
     httpServer.listen(settings.port);
 

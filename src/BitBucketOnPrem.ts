@@ -1,12 +1,13 @@
-import _ = require("lodash");
-import UrlAssembler = require("url-assembler");
-import { notify } from "./exceptionManager";
-import { getStoreSafe } from "./explorook-store";
-import { getLogger } from "./logger";
+import _ from "lodash";
+import nodeFetch from "node-fetch";
+import UrlAssembler from "url-assembler";
+import {notify} from "./exceptionManager";
+import {getStoreSafe} from "./explorook-store";
+import {getLogger} from "./logger";
 
 const logger = getLogger("bitbucket");
 const isNode = () => !(typeof window !== "undefined" && window !== null);
-const fetch = isNode() ? require("node-fetch") : window.fetch;
+const fetch = isNode() ? nodeFetch : window.fetch;
 const store = getStoreSafe();
 
 // An id of the repo that is currently being cached (empty if nothing is being cached)
@@ -104,7 +105,7 @@ const fetchNoCache = (requestInfo: RequestInfo, requestInit: RequestInit) => {
     if (!requestInit?.credentials) {
         requestInit.credentials = "omit";
     }
-    return fetch(requestInfo.toString().replace("scm/", "").replace("scm%2F", ""), requestInit);
+    return fetch(requestInfo.toString().replace("scm/", "").replace("scm%2F", ""), requestInit as any);
 };
 
 /**
@@ -119,7 +120,7 @@ const fetchNoCache = (requestInfo: RequestInfo, requestInit: RequestInit) => {
 const fetchTreeParallel =
     async ({fileTreeUrl, accessToken, start, limit}: {fileTreeUrl: string; accessToken: string; start: number; limit: number}):
         Promise<string[][]> => {
-    const requests = _.map([0, 1, 2, 3, 4], async reqIndex => {
+    const requests = _.map([0, 1, 2, 3, 4], async (reqIndex: number) => {
         const currentStart = start + (reqIndex * limit);
         const res = await fetchNoCache(`${fileTreeUrl}&start=${currentStart}&limit=${limit}`, {
             headers: {
@@ -316,7 +317,7 @@ export const idsOfAllCachedTrees = async (): Promise<BitbucketOnPremRepoProps[]>
     logger.debug("Getting all the ids of the cached trees");
     const currentCachedRepos = JSON.parse(store.get("bitbucketTrees", "{}"));
     const ids: BitbucketOnPremRepoProps[] = [];
-    _.each(currentCachedRepos, (tree, id) => {
+    _.each(currentCachedRepos, (tree: any, id: string) => {
         ids.push(getRepoFromId(id));
     });
     return ids;
@@ -333,7 +334,7 @@ export const searchBitbucketTree = async ({projectKey, repoName, commit, searchT
     const repoId = getRepoId({projectKey, repoName, commit});
     // Check if the tree is already cached
     const cachedTree = currentCachedRepos[repoId];
-    const results = _.filter(cachedTree, file => _.includes(file?.toLowerCase(), searchTerm?.toLowerCase()));
+    const results = _.filter(cachedTree, (file: string) => _.includes(file?.toLowerCase(), searchTerm?.toLowerCase()));
     // If maxResults is specified, return the first n results (n being maxResults)
     if (maxResults) {
         return _.slice(results, 0, maxResults);
@@ -509,7 +510,7 @@ export const getFileContentFromBitbucket = async ({url, accessToken, projectKey,
                 }
             });
             const file = await res.json();
-            _.forEach(file.lines, line => {
+            _.forEach(file.lines, (line: any) => {
                 fileContent += `${line.text}\r\n`;
             });
 

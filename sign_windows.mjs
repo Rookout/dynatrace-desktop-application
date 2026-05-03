@@ -1,6 +1,6 @@
-const package = require("./package.json");
+import { execSync } from 'child_process';
 
-exports.default = async function(configuration) {
+export default async function(configuration) {
   // do not include passwords or other sensitive data in the file
   // rather create environment variables with sensitive data
   const PE_PATH = configuration.path;
@@ -23,10 +23,10 @@ exports.default = async function(configuration) {
     `"${PE_PATH}"`,
   ];
 
-  require("child_process").execSync(
+  execSync(
     command.join(" "),
     {
       stdio: "inherit",
     },
   );
-};
+}

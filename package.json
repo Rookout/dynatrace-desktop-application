@@ -1,18 +1,18 @@
 {
   "name": "dynatrace-desktop-application",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "dynatrace desktop application's site addon to support local files and folders",
   "main": "dist/index.js",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.main.config.js && cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.index-worker.config.js",
+    "build": "webpack --config webpack.main.config.mjs && webpack --config webpack.index-worker.config.mjs",
     "postbuild": "copyfiles index-worker.html ./dist/",
     "package-linux": "electron-builder --linux APPIMAGE",
     "package-windows": "electron-builder --win",
-    "build-headless": "tsc",
+    "build-headless": "tsc -p tsconfig.headless.json",
     "dist": "electron-builder",
-    "build-packages-all-distributions": "cross-env NODE_OPTIONS=--openssl-legacy-provider ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder --mac --win --linux --arm64 --x64 -p always",
+    "build-packages-all-distributions": "cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder --mac --win --linux --arm64 --x64 -p always",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "cross-env development=1 yarn run build && cross-env development=1 electron ./dist/index.js",
+    "start": "cross-env development=1 yarn run build && cross-env development=1 electron .",
     "start-headless": "yarn run build-headless && node ./dist/headless.js -p=44512",
     "debug": "cross-env development=1 $NODE_DEBUG_OPTION yarn run build && cross-env development=1 electron --inspect-brk ./dist/index.js"
   },
@@ -20,7 +20,7 @@
     "productName": "Dynatrace Desktop App",
     "extends": null,
     "appId": "com.rookout.dynatrace-desktop-application",
-    "afterSign": "./afterSignHook.js",
+    "afterSign": "./afterSignHook.mjs",
     "publish": [
       {
         "provider": "github",
@@ -54,7 +54,9 @@
         "x-scheme-handler/dynatrace"
       ],
       "desktop": {
-        "exec": "rookout %u"
+        "entry": {
+          "Exec": "rookout %u"
+        }
       }
     },
     "dmg": {
@@ -64,12 +66,12 @@
       "icon": "assets/icons/mac/icons.icns"
     },
     "win": {
-      "publisherName": [
-        "Dynatrace Israel LTD"
-      ],
       "target": "NSIS",
-      "sign": "./sign_windows.js",
-      "icon": "assets/icons/logo@512x512.png"
+      "icon": "assets/icons/logo@512x512.png",
+      "signtoolOptions": {
+        "sign": "./sign_windows.mjs",
+        "publisherName": "Dynatrace Israel LTD"
+      }
     }
   },
   "repository": "https://github.com/rookout/dynatrace-desktop-application",
@@ -102,8 +104,8 @@
     "aws-lambda": "^1.0.5",
     "copyfiles": "^2.3.0",
     "cross-env": "^5.2.0",
-    "electron": "26.6.10",
-    "electron-builder": "24.7.0",
+    "electron": "41.3.0",
+    "electron-builder": "26.8.2",
     "graphql-middleware": "6.1.28",
     "node-fetch": "^2.6.7",
     "ts-loader": "^9.5.1",
@@ -116,15 +118,15 @@
   "dependencies": {
     "@apollo/server": "^5.5.0",
     "@as-integrations/express5": "^1.1.2",
-    "@electron/notarize": "^2.1.0",
-    "@electron/remote": "2.0.10",
+    "@electron/notarize": "^3.1.1",
+    "@electron/remote": "2.1.3",
     "@graphql-tools/schema": "^8.3.13",
     "args-parser": "^1.1.0",
     "auto-launch": "^5.0.5",
     "cors": "^2.8.5",
-    "electron-log": "4.4.7",
-    "electron-store": "8.0.1",
-    "electron-updater": "6.6.2",
+    "electron-log": "5.4.3",
+    "electron-store": "11.0.2",
+    "electron-updater": "6.8.3",
     "express": "5.2.1",
     "graphql": "^16.11.0",
     "isomorphic-git": "^1.8.2",
@@ -135,7 +137,7 @@
     "semver": "7.5.4",
     "slash": "3.0.0",
     "url-assembler": "^2.1.1",
-    "uuid": "^3.2.1",
+    "uuid": "^9.0.0",
     "validator": "^13.6.0",
     "walk": "^2.3.13"
   },

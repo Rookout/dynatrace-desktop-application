@@ -1,6 +1,5 @@
 import {dialog} from "electron";
-
-const path = require("path");
+import path from "path";
 
 const PROTOCOLS = ["rookout", "dynatrace"];
 
@@ -9,7 +8,7 @@ export const initDeeplinks = (app: Electron.App) => {
         if (!process.defaultApp) {
             app.setAsDefaultProtocolClient(protocol);
             return;
-        }    
+        }
         if (process.argv.length >= 2) {
             app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])]);
         }

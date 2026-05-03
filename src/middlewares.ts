@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { IMiddlewareFunction } from "graphql-middleware/dist/types";
-import _ = require("lodash");
+import { IMiddlewareFunction } from "graphql-middleware";
+import _ from "lodash";
 import { posix } from "path";
 import { Repository } from "./common/repository";
 import { notify } from "./exceptionManager";
@@ -28,7 +28,7 @@ export const resolveRepoFromId: IMiddlewareFunction = (resolve, parent, args, co
   const { repoId } = args;
   if (!repoId) { return resolve(parent, args, context, info); }
   const repos = repStore.getRepositories();
-  const targetRepo = _.find(repos, (rep) => rep.id.toLowerCase() === repoId.toLocaleLowerCase());
+  const targetRepo = _.find(repos, (rep: any) => rep.id.toLowerCase() === repoId.toLocaleLowerCase());
   if (!targetRepo) {
     throw new GraphQLError(`repository "${repoId}" not found`);
   }
@@ -49,5 +49,3 @@ export const filterDirTraversal: IMiddlewareFunction = (resolve, parent, args: {
   }
   return resolve(parent, args, context, info);
 };
-
-

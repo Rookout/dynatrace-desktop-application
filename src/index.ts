@@ -1,35 +1,20 @@
-import {
-  enable as remoteEnable,
-  initialize as initElectronRemote
-} from "@electron/remote/main";
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  IpcMainEvent,
-  Menu,
-  nativeImage,
-  nativeTheme,
-  Notification,
-  Tray
-} from "electron";
+import {enable as remoteEnable, initialize as initElectronRemote} from "@electron/remote/main";
+import AutoLaunch from "auto-launch";
+import {app, BrowserWindow, ipcMain, IpcMainEvent, Menu, nativeImage, nativeTheme, Notification, Tray} from "electron";
 import * as log from "electron-log";
-import * as Store from "electron-store";
 import {autoUpdater, UpdateInfo} from "electron-updater";
-import fs = require("fs");
-import * as path from "path";
-import {deeplinkHandler, initDeeplinks} from "./deeplinks";
-import { ExplorookStore } from "./explorook-store";
-const uuidv4 = require("uuid/v4");
-import AutoLaunch = require("auto-launch");
+import fs from "fs";
 import fetch from "node-fetch";
+import * as path from "path";
 import {SemVer} from "semver";
-import { Logger, notify } from "./exceptionManager";
+import {v4 as uuidv4} from "uuid";
+import {deeplinkHandler, initDeeplinks} from "./deeplinks";
+import {Logger, notify} from "./exceptionManager";
+import {ExplorookStore} from "./explorook-store";
 
 initElectronRemote();
 autoUpdater.logger = new Logger();
 log.transports.console.level = "warn";
-Store.initRenderer();
 
 const ICONS_DIR = "../assets/icons/";
 const APP_ICON = path.join(__dirname, ICONS_DIR, getAppIcon());
@@ -133,6 +118,16 @@ function registerIpc() {
       store.set("linux-start-with-os", false);
       al.disable().then(() => e.sender.send("auto-launch-is-enabled-changed", false));
     }
+  });
+
+  // Forward messages from the index-worker window to the main window.
+  // ipcRenderer.sendTo() was removed in Electron 29; the worker now sends
+  // to main which relays to the renderer.
+  ipcMain.on("refresh-repos", (e: IpcMainEvent, repos: any) => {
+    if (mainWindow) mainWindow.webContents.send("refresh-repos", repos);
+  });
+  ipcMain.on("pop-choose-repository", () => {
+    if (mainWindow) mainWindow.webContents.send("pop-choose-repository");
   });
 }
 
@@ -292,7 +287,9 @@ function createWindows() {
 }
 
 function startGraphqlServer() {
-  indexWorker.webContents.send("main-window-id", firstTimeLaunch, mainWindow.webContents.id);
+  // mainWindow.webContents.id is no longer passed — worker used it only for
+  // ipcRenderer.sendTo() which was removed in Electron 29.
+  indexWorker.webContents.send("main-window-id", firstTimeLaunch);
 }
 
 function createMainWindow(indexWorkerWindow: BrowserWindow, hidden: boolean = false) {
