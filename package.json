@@ -49,15 +49,11 @@
     "linux": {
       "target": "appImage",
       "category": "Utility",
+      "executableName": "rookout",
       "mimeTypes": [
         "x-scheme-handler/rookout",
         "x-scheme-handler/dynatrace"
-      ],
-      "desktop": {
-        "entry": {
-          "Exec": "rookout %u"
-        }
-      }
+      ]
     },
     "dmg": {
       "background": "assets/dmg-background.png"
