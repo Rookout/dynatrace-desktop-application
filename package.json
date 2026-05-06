@@ -32,9 +32,8 @@
       "output": "installers"
     },
     "protocols": {
-      "name": "rookout",
+      "name": "dynatrace",
       "schemes": [
-        "rookout",
         "dynatrace"
       ]
     },
@@ -51,7 +50,6 @@
       "category": "Utility",
       "executableName": "rookout",
       "mimeTypes": [
-        "x-scheme-handler/rookout",
         "x-scheme-handler/dynatrace"
       ]
     },
