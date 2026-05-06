@@ -1,7 +1,7 @@
 import {dialog} from "electron";
 import path from "path";
 
-const PROTOCOLS = ["rookout", "dynatrace"];
+const PROTOCOLS = ["dynatrace"];
 
 export const initDeeplinks = (app: Electron.App) => {
     PROTOCOLS.forEach(protocol => {
