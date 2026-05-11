@@ -145,6 +145,9 @@ function registerIpc() {
   ipcMain.on("pop-choose-repository", () => {
     if (mainWindow) mainWindow.webContents.send("pop-choose-repository");
   });
+  ipcMain.on("add-repo", (e: IpcMainEvent, repo: any) => {
+    if (indexWorker) indexWorker.webContents.send("add-repo", repo);
+  });
 }
 
 

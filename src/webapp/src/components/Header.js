@@ -4,8 +4,9 @@ import { ipcRenderer } from "electron";
 import { app } from "@electron/remote";
 import { Menu, MenuItem } from "@material-ui/core";
 import { closeWindow } from "../utils";
-import * as Store from "electron-store";
+import Store from "electron-store";
 
+const store = new Store({ name: "explorook" });
 const DYNATRACE_DESKTOP_APPLICATION_VERSION = app.getVersion();
 
 export const Header = () => {
@@ -23,14 +24,13 @@ export const Header = () => {
         setOpen(false);
     };
 
-    const store = new Store({ name: "explorook" });
     const isLogLevelDebug = store.get("logLevel", "debug") === "debug";
     const setLogLever = isDebug => {
-        ipcRenderer.sendTo(window.indexWorkerId, "set-log-level", isDebug ? "debug" : "error")
+        ipcRenderer.send("set-log-level", isDebug ? "debug" : "error")
         setOpen(false);
     }
     const clearAllRepos = () => {
-        ipcRenderer.sendTo(window.indexWorkerId, "clear-all-repos");
+        ipcRenderer.send( "clear-all-repos");
         setOpen(false);
     }
 
