@@ -14,7 +14,7 @@ export const ReposAddHandler = () => {
         ipcRenderer.on('pop-choose-repository', () => {
             onPopDialogRequested()
         })
-        ipcRenderer.sendTo(window.indexWorkerId, 'repos-request')
+        ipcRenderer.send('repos-request')
     }, [])
 
     const onPopDialogRequested = async () => {
@@ -45,7 +45,7 @@ export const ReposAddHandler = () => {
             const folder = filePaths[i]
             const repoName = path.basename(folder)
             const newRepo = { repoName, fullpath: folder }
-            ipcRenderer.sendTo(window.indexWorkerId, 'add-repo', newRepo)
+            ipcRenderer.send('add-repo', newRepo)
         }
     }
 
