@@ -49,6 +49,7 @@
       "target": "appImage",
       "category": "Utility",
       "executableName": "rookout",
+      "executableArgs": ["--no-sandbox"],
       "mimeTypes": [
         "x-scheme-handler/dynatrace"
       ]
