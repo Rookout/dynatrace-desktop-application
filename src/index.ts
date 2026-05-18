@@ -84,7 +84,7 @@ async function enableAutoLaunch() {
 // Inside an AppImage the filesystem is read-only and user-mounted, so SUID can
 // never be set, causing a FATAL crash on Ubuntu 24+ when the app autostarts.
 // createAutoLaunch builds an AutoLaunch instance and, on Linux AppImage builds,
-// patches opts.appPath to include --no-sandbox AFTER construction.
+// patches opts.appPath to include --no-sandbox after construction.
 // Patching appPath post-construction leaves appName intact while ensuring the
 // Exec= line in the generated .desktop file carries the flag.
 */
