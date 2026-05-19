@@ -80,6 +80,20 @@ async function enableAutoLaunch() {
   }
 }
 
+// On Linux AppImage builds, Electron's chrome-sandbox requires SUID root permissions.
+// Inside an AppImage the filesystem is read-only and user-mounted, so SUID can
+// never be set, causing a FATAL crash on Ubuntu 24+ when the app autostarts.
+// createAutoLaunch patches opts.appPath after construction (not during) to inject
+// --no-sandbox into the Exec= line of the generated .desktop autostart file,
+// while leaving appName intact so the .desktop filename remains correct.
+function createAutoLaunch(config: { name: string; isHidden: boolean; path?: string }): AutoLaunch {
+  const instance = new AutoLaunch(config);
+  if (process.platform === "linux" && process.env.APPIMAGE) {
+    (instance as any).opts.appPath = `"${process.env.APPIMAGE}" --no-sandbox`;
+  }
+  return instance;
+}
+
 // registerIpc listens to ipc requests\event
 function registerIpc() {
   let alConfig = { name: "Explorook", isHidden: true };
@@ -89,7 +103,7 @@ function registerIpc() {
   if (process.env.APPIMAGE) {
     alConfig = Object.assign(alConfig, { path: process.env.APPIMAGE });
   }
-  al = new AutoLaunch(alConfig);
+  al = createAutoLaunch(alConfig);
   linuxAutoLaunchPatch();
   firstTimeAutoLaunch();
   ipcMain.on("hidden", displayWindowHiddenNotification);
