@@ -32,8 +32,7 @@ export default async function (context) {
     try {
         fs.renameSync(originalBin, wrappedBin);
     } catch (error) {
-        console.warn(`afterPack (Linux): could not wrap ${executableName} — binary not found or inaccessible: ${error.message}`);
-        return;
+        throw new Error(`afterPack (Linux): could not wrap ${executableName} — binary not found or inaccessible: ${error.message}`);
     }
 
     fs.writeFileSync(
