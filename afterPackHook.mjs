@@ -25,16 +25,16 @@ export default async function (context) {
 
     console.log(`afterPack (Linux): wrapping ${executableName} with --no-sandbox launcher`);
 
-    if (!fs.existsSync(originalBin)) {
-        console.warn(`afterPack (Linux): binary not found at ${originalBin}, skipping`);
-        return;
-    }
-
     // Rename the real binary, then create a wrapper script in its place.
     // $APPDIR is set by AppRun before calling this wrapper, so it is always
     // available. We fall back to the script's own directory for the rare case
     // where the wrapper is invoked directly outside of an AppImage context.
-    fs.renameSync(originalBin, wrappedBin);
+    try {
+        fs.renameSync(originalBin, wrappedBin);
+    } catch (error) {
+        console.warn(`afterPack (Linux): could not wrap ${executableName} — binary not found or inaccessible: ${error.message}`);
+        return;
+    }
 
     fs.writeFileSync(
         originalBin,
