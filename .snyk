@@ -9,4 +9,12 @@ ignore:
           not pass schema (only name/watch), so vulnerable path is unreachable.
         expires: 2026-08-23T00:00:00.000Z
         created: 2026-02-23T19:40:25.431Z
+  SNYK-JS-PROTOBUFJSUTF8-16643422:
+    - '*':
+        reason: >-
+          Not exploitable: @apollo/protobufjs loads a hardcoded schema bundled in
+          @apollo/usage-reporting-protobuf — no user-controlled descriptor is ever
+          loaded, so the crafted-schema attack vector does not exist in this app.
+        expires: 2026-11-17T00:00:00.000Z
+        created: 2026-05-17T00:00:00.000Z
 patch: {}
