@@ -80,18 +80,16 @@ async function enableAutoLaunch() {
   }
 }
 
-/* Electron's bundled chrome-sandbox requires SUID root permissions.
+// On Linux AppImage builds, Electron's chrome-sandbox requires SUID root permissions.
 // Inside an AppImage the filesystem is read-only and user-mounted, so SUID can
 // never be set, causing a FATAL crash on Ubuntu 24+ when the app autostarts.
-// createAutoLaunch builds an AutoLaunch instance and, on Linux AppImage builds,
-// patches opts.appPath to include --no-sandbox after construction.
-// Patching appPath post-construction leaves appName intact while ensuring the
-// Exec= line in the generated .desktop file carries the flag.
-*/
+// createAutoLaunch patches opts.appPath after construction (not during) to inject
+// --no-sandbox into the Exec= line of the generated .desktop autostart file,
+// while leaving appName intact so the .desktop filename remains correct.
 function createAutoLaunch(config: { name: string; isHidden: boolean; path?: string }): AutoLaunch {
   const instance = new AutoLaunch(config);
   if (process.platform === "linux" && process.env.APPIMAGE) {
-    (instance as any).opts.appPath = `${process.env.APPIMAGE} --no-sandbox`;
+    (instance as any).opts.appPath = `"${process.env.APPIMAGE}" --no-sandbox`;
   }
   return instance;
 }

@@ -21,6 +21,10 @@
     "extends": null,
     "appId": "com.rookout.dynatrace-desktop-application",
     "afterSign": "./afterSignHook.mjs",
+    "afterPack": "./afterPackHook.mjs",
+    "toolsets": {
+      "appimage": "1.0.2"
+    },
     "publish": [
       {
         "provider": "github",
@@ -49,7 +53,6 @@
       "target": "appImage",
       "category": "Utility",
       "executableName": "rookout",
-      "executableArgs": ["--no-sandbox"],
       "mimeTypes": [
         "x-scheme-handler/dynatrace"
       ]
