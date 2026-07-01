@@ -39,7 +39,7 @@ To run the webapp server:
 1. run ``yarn start`` in the root directory to run the electron app
 
 # Build for production
-see `.circleci/config.yml`
+see `.github/workflows/release.yml` (the release pipeline; migrated from CircleCI)
 
 # Misc.
 Added the following to several "build" commands:

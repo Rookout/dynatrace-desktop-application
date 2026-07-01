@@ -1,0 +1,101 @@
+name: Release
+
+# Active release pipeline (migrated from .circleci/config.yml, APPOBS-36834).
+# Builds, signs and notarizes the app for mac/win/linux (x64 + arm64) on a single
+# macOS runner and publishes the artifacts as a GitHub Release via electron-builder.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+permissions:
+  contents: write   # electron-builder GitHub release publish + version-bump push
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need full tag history for version validation
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.13.0"
+          cache: yarn
+
+      - name: Setup Java (required by jsign for Windows signing)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Wine (required to sign Windows executables)
+        run: |
+          brew list --cask xquartz >/dev/null 2>&1 || brew install --cask xquartz
+          brew list --cask wine-stable >/dev/null 2>&1 || brew install --cask wine-stable
+
+      - name: Validate version has no release yet
+        run: bash ./validate_version.sh
+
+      - name: Install dependencies and build
+        run: |
+          # custom jsign used to sign PE (Windows) binaries
+          cp ./ci/jsign-2.1.jar jsign.jar
+          # install electron main window dependencies and build the TypeScript code
+          yarn
+          yarn run build
+          # CRA treats warnings as errors when CI=true - disable that for the webapp build
+          export CI=false
+          yarn --cwd=src/webapp && yarn run --cwd=src/webapp build
+
+      - name: Prepare signing credentials
+        env:
+          GOOGLE_SERVICE_ACCOUNT_KEY_BASE64: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 }}
+          NEW_CSC_LINK: ${{ secrets.NEW_CSC_LINK }}
+          NEW_CSC_KEY_PASSWORD: ${{ secrets.NEW_CSC_KEY_PASSWORD }}
+          APPLE_CERT: ${{ secrets.APPLE_CERT }}
+          WIN_EV_CERT_BASE64_25: ${{ secrets.WIN_EV_CERT_BASE64_25 }}
+        run: |
+          # --- Google credentials (Application Default Credentials for jsign GOOGLE_HSM) ---
+          echo "$GOOGLE_SERVICE_ACCOUNT_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/gcloud_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcloud_sa.json" >> "$GITHUB_ENV"
+
+          # --- macOS signing: dedicated temporary keychain ---
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+          echo "$NEW_CSC_LINK" | base64 --decode > "$RUNNER_TEMP/mac_cert.p12"
+          echo "$APPLE_CERT" | base64 --decode > "$RUNNER_TEMP/wwdr.cer"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$RUNNER_TEMP/wwdr.cer" -k "$KEYCHAIN_PATH" -T /usr/bin/codesign
+          security import "$RUNNER_TEMP/mac_cert.p12" -P "$NEW_CSC_KEY_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" >/dev/null
+          # make the temp keychain the default so electron-builder finds the identity
+          security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
+          security default-keychain -s "$KEYCHAIN_PATH"
+
+          echo "CSC_LINK=$RUNNER_TEMP/mac_cert.p12" >> "$GITHUB_ENV"
+          echo "CSC_KEY_PASSWORD=$NEW_CSC_KEY_PASSWORD" >> "$GITHUB_ENV"
+
+          # --- Windows EV certificate ---
+          echo "$WIN_EV_CERT_BASE64_25" | base64 --decode > dynatrace.crt
+          echo "WINDOWS_EV_CERTIFICATE_PATH=dynatrace.crt" >> "$GITHUB_ENV"
+
+      - name: Build, sign, notarize and publish
+        env:
+          # electron-builder GitHub release publishing
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS notarization (read by afterSignHook.mjs)
+          APPLE_DEV_USER: ${{ secrets.APPLE_DEV_USER }}
+          APPLE_DEV_PASSWORD: ${{ secrets.APPLE_DEV_PASSWORD }}
+          appleTeamId: ${{ secrets.APPLE_TEAM_ID }}
+          # Windows signing (read by sign_windows.mjs)
+          GOOGLE_HSM_KEY_ID: ${{ secrets.GOOGLE_HSM_KEY_ID }}
+          # CSC_LINK, CSC_KEY_PASSWORD, WINDOWS_EV_CERTIFICATE_PATH and
+          # GOOGLE_APPLICATION_CREDENTIALS are exported via $GITHUB_ENV above.
+        run: yarn run build-packages-all-distributions

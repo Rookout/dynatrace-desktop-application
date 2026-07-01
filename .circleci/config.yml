@@ -1,9 +1,13 @@
+# DISABLED: the release pipeline was migrated to GitHub Actions (APPOBS-36834).
+# The active pipeline now lives in .github/workflows/release.yml. This file is kept for
+# reference/fallback only - the branch filter below points at a branch that never exists so
+# no job runs. To re-enable CircleCI, restore "only: master".
 version: 2.1
 references:
   filter_master: &filter_master
     filters:
       branches:
-        only: master
+        only: __circleci_disabled__
 orbs:
   node: circleci/node@7.1.0
 
@@ -100,15 +104,6 @@ jobs:
       - run:
           name: Validate version has no release yet
           command: sh ./validate_version.sh
-  publish_release_notes:
-    docker:
-      - image: node:24.13.0
-    steps:
-      - checkout
-      - run:
-          name: Generate release notes
-          command: |
-            export DYNATRACE_DESKTOP_APP_VERSION=$(node -e 'console.log(require("./package").version)') && curl -X POST https://github-enforcer.rookout.com/release -H "Content-Type: application/json" -H "X-Enforcer-Signature: $ENFORCER_SECRET" -d '{"repository":{"full_name":"Rookout/dynatrace-desktop-application"},"data":{"inner_version":"v'$DYNATRACE_DESKTOP_APP_VERSION'","version_to_publish":"'$DYNATRACE_DESKTOP_APP_VERSION'","component":"dynatrace-desktop-application","released_by":"CircleCI"}}'
 workflows:
   version: 2
   publish-pipeline:
@@ -118,6 +113,3 @@ workflows:
       - publish:
           requires:
             - version_validation
-      - publish_release_notes:
-          requires:
-            - publish

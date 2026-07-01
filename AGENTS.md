@@ -80,7 +80,7 @@ If you change the regex or skip the `isapprefallowed` round-trip you are widenin
 - `electron-builder` config lives in the `build` key of root `package.json`. App ID is still `com.rookout.dynatrace-desktop-application` and the `publish` provider is `github` owner `rookout` — these are stable, don't rename casually.
 - macOS notarization: `afterSignHook.mjs` runs `@electron/notarize` if `APPLE_DEV_USER` / `APPLE_DEV_PASSWORD` / `appleTeamId` are set; otherwise it logs and returns (so local builds don't fail).
 - Windows signing: `sign_windows.mjs` shells out to `jsign.jar` against a Google HSM key (`GOOGLE_HSM_KEY_ID`, `WINDOWS_EV_CERTIFICATE_PATH`); skipped locally when those env vars are unset.
-- CircleCI (`.circleci/config.yml`) is the only release pipeline — runs on a macOS executor with Wine + gcloud + jsign, signs all three platforms in a single job, publishes to GitHub releases and `gs://get.rookout.com/dynatrace-desktop-application/`.
+- GitHub Actions (`.github/workflows/release.yml`) is the release pipeline — runs on a GitHub-hosted macOS runner with Wine + jsign, signs all three platforms in a single job, and publishes to GitHub releases via electron-builder. Windows signing still authenticates to Google Cloud HSM (jsign `GOOGLE_HSM`), so `GOOGLE_SERVICE_ACCOUNT_KEY_BASE64` is still required. `.circleci/config.yml` is the previous pipeline, kept for reference but disabled (its branch filter no longer matches `master`). The old `gs://get.rookout.com` upload was dropped during the migration.
 
 ## Conventions worth knowing
 

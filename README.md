@@ -11,7 +11,7 @@
 </p>
 
 ## About
-[![CircleCI](https://img.shields.io/circleci/build/github/Rookout/dynatrace-desktop-application.svg?style=flat-square)](https://circleci.com/gh/Rookout/dynatrace-desktop-application)
+[![Release](https://img.shields.io/github/actions/workflow/status/Rookout/dynatrace-desktop-application/release.yml?branch=master&style=flat-square)](https://github.com/Rookout/dynatrace-desktop-application/actions/workflows/release.yml)
 [![GitHub release](https://img.shields.io/github/release/rookout/dynatrace-desktop-application.svg?style=flat-square)](https://GitHub.com/Rookout/dynatrace-desktop-application/releases/)
 [![Github all releases](https://img.shields.io/github/downloads/rookout/dynatrace-desktop-application/total.svg?style=flat-square)](https://GitHub.com/Rookout/dynatrace-desktop-application/releases/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=flat-square)](https://GitHub.com//Rookout/dynatrace-desktop-application/graphs/commit-activity)
