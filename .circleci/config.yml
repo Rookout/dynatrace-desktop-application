@@ -27,6 +27,7 @@ jobs:
           name: Install Wine
           command: |
             # wine is required to sign windows executables
+            brew update
             brew install --cask xquartz
             brew install --cask wine-stable
       - run:
@@ -100,15 +101,6 @@ jobs:
       - run:
           name: Validate version has no release yet
           command: sh ./validate_version.sh
-  publish_release_notes:
-    docker:
-      - image: node:24.13.0
-    steps:
-      - checkout
-      - run:
-          name: Generate release notes
-          command: |
-            export DYNATRACE_DESKTOP_APP_VERSION=$(node -e 'console.log(require("./package").version)') && curl -X POST https://github-enforcer.rookout.com/release -H "Content-Type: application/json" -H "X-Enforcer-Signature: $ENFORCER_SECRET" -d '{"repository":{"full_name":"Rookout/dynatrace-desktop-application"},"data":{"inner_version":"v'$DYNATRACE_DESKTOP_APP_VERSION'","version_to_publish":"'$DYNATRACE_DESKTOP_APP_VERSION'","component":"dynatrace-desktop-application","released_by":"CircleCI"}}'
 workflows:
   version: 2
   publish-pipeline:
@@ -118,6 +110,3 @@ workflows:
       - publish:
           requires:
             - version_validation
-      - publish_release_notes:
-          requires:
-            - publish
