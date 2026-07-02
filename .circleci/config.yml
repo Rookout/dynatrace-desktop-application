@@ -72,17 +72,6 @@ jobs:
             export WINDOWS_EV_CERTIFICATE_PATH=dynatrace.crt          
             # package code for every distribution (mac, win, linux) and publish as github release
             yarn run build-packages-all-distributions
-      - run:
-          name: Publish
-          command: |
-            #Save gcloud credentials service account and authenticate
-            bash google-cloud-sdk/install.sh --rc-path=/Users/distiller/.bashrc --usage-reporting=false --path-update=true --command-completion=true --install-python=true --quiet
-            source ~/.bashrc
-            echo $GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 | base64 --decode > gcloud_service_account.json
-            export GOOGLE_APPLICATION_CREDENTIALS=gcloud_service_account.json
-            gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-            # publish in google storage bucket (additionally to electronbuild-publisher)
-            bash upload_release_to_gs.sh
       - save_cache:
           key: homebrew-cache-{{ arch }}-{{ .Environment.CACHE_VERSION }}-{{ checksum ".circleci/config.yml" }}
           paths:
