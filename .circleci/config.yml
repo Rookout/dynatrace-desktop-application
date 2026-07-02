@@ -27,6 +27,7 @@ jobs:
           name: Install Wine
           command: |
             # wine is required to sign windows executables
+            brew update
             brew install --cask xquartz
             brew install --cask wine-stable
       - run:
