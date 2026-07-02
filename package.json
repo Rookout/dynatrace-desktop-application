@@ -104,7 +104,7 @@
     "cross-env": "^5.2.0",
     "electron": "41.3.0",
     "electron-builder": "26.8.2",
-    "graphql-middleware": "^6.1.35",
+    "graphql-middleware": "6.1.28",
     "node-fetch": "^2.6.7",
     "ts-loader": "^9.5.1",
     "tslint": "^5.10.0",
@@ -142,15 +142,6 @@
   "resolutions": {
     "@playlyfe/gql/lodash": "^4.17.15",
     "graphql-constraint-directive/validator": "^13.6.0",
-    "sha.js": "^2.4.12",
-    "qs": "^6.14.2",
-    "js-yaml": "^4.1.1",
-    "fast-uri": "^3.1.3"
-  },
-  "overrides": {
-    "@playlyfe/gql": {
-      "lodash": "^4.17.15"
-    },
     "sha.js": "^2.4.12",
     "qs": "^6.14.2",
     "js-yaml": "^4.1.1",
