@@ -29,7 +29,9 @@ jobs:
             # wine is required to sign windows executables
             brew update
             brew install --cask xquartz
-            brew install --cask wine-stable
+            # homebrew/cask's wine-stable was disabled; use the Gcenx tap which publishes the same builds
+            brew tap gcenx/wine
+            brew install --cask --no-quarantine gcenx/wine/wine-stable
       - run:
           name: Install gcloud sdk
           command: |
