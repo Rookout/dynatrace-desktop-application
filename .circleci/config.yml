@@ -27,9 +27,17 @@ jobs:
           name: Install Wine
           command: |
             # wine is required to sign windows executables
-            brew update
-            brew install --cask xquartz
-            brew install --cask wine-stable
+            # homebrew/cask's wine-stable was disabled, so install a pinned, checksum-verified build
+            # from https://github.com/Gcenx/macOS_Wine_builds. To upgrade, bump both values below.
+            WINE_VERSION="11.0_1"
+            WINE_SHA256="b50dc50ec7f41d58b115a6b685d4d1315ba3c797bd3aa0f49213f2703cb82388"
+            curl -fsSL "https://github.com/Gcenx/macOS_Wine_builds/releases/download/${WINE_VERSION}/wine-stable-${WINE_VERSION}-osx64.tar.xz" -o /tmp/wine-stable.tar.xz
+            echo "${WINE_SHA256}  /tmp/wine-stable.tar.xz" | shasum -a 256 -c -
+            mkdir -p "$HOME/wine"
+            tar -xf /tmp/wine-stable.tar.xz -C "$HOME/wine"
+            echo 'export PATH="$HOME/wine/Wine Stable.app/Contents/Resources/wine/bin:$PATH"' >> "$BASH_ENV"
+            source "$BASH_ENV"
+            wine --version
       - run:
           name: Install gcloud sdk
           command: |
