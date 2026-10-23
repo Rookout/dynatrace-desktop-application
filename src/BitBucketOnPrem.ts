@@ -6,8 +6,10 @@ import {getStoreSafe} from "./explorook-store";
 import {getLogger} from "./logger";
 
 const logger = getLogger("bitbucket");
-const isNode = () => !(typeof window !== "undefined" && window !== null);
-const fetch = isNode() ? nodeFetch : window.fetch;
+// Always node-fetch, never the renderer's window.fetch: only node-fetch honours `compress: false`.
+// Chromium's fetch ignores it and treats Accept-Encoding as a forbidden header, so it would decode
+// a brotli response itself - see fetchNoCache below (CVE-2026-111497).
+const fetch = nodeFetch;
 const store = getStoreSafe();
 
 // An id of the repo that is currently being cached (empty if nothing is being cached)
@@ -105,6 +107,12 @@ const fetchNoCache = (requestInfo: RequestInfo, requestInit: RequestInit) => {
     if (!requestInit?.credentials) {
         requestInit.credentials = "omit";
     }
+    // Never decompress the response: Node's brotli decoder is vulnerable to CVE-2026-111497.
+    // The bitbucket server URL comes from user input, so a caller can point us at a server they
+    // control and have it answer with a crafted brotli body. `compress: false` stops node-fetch
+    // from decoding it and Accept-Encoding: identity asks for an uncompressed body up front.
+    (requestInit as any).compress = false;
+    requestInit.headers = {...(requestInit.headers as Record<string, string>), "Accept-Encoding": "identity"};
     return fetch(requestInfo.toString().replace("scm/", "").replace("scm%2F", ""), requestInit as any);
 };
 
