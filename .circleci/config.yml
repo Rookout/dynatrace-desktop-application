@@ -10,7 +10,7 @@ orbs:
 jobs:
   publish:
     macos:
-      xcode: "26.3.0"
+      xcode: "26.6.0"
     resource_class: m4pro.medium
     steps:
       - run:
@@ -98,7 +98,7 @@ jobs:
             - /usr/local/Homebrew
   version_validation:
     macos:
-      xcode: "26.3.0"
+      xcode: "26.6.0"
     resource_class: m4pro.medium
     steps:
       - run:
