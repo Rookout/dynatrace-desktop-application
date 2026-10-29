@@ -25,12 +25,7 @@ const corsOptionsDelegate = async (req: cors.CorsRequest, callback: (err: Error 
             return;
         }
 
-        // Never decompress the response: Node's brotli decoder is vulnerable to CVE-2026-111497.
-        // This endpoint returns a small JSON body, so skipping compression costs nothing.
-        const response = await fetch(`${origin}/platform-reserved/dob/isapprefallowed?appOrigin=${origin}`, {
-            compress: false,
-            headers: {"Accept-Encoding": "identity"}
-        });
+        const response = await fetch(`${origin}/platform-reserved/dob/isapprefallowed?appOrigin=${origin}`);
 
         if (!response.ok) {
             callback(null, DENY_CORS_OPTION);

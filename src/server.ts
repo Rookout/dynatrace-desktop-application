@@ -63,10 +63,7 @@ export const start = async (options: StartOptions) => {
     app.use('/',
         allowedHostsMiddleware,
         getCorsMiddleware(),
-        // inflate: false rejects compressed request bodies instead of decompressing them, so an
-        // incoming Content-Encoding: br body never reaches Node's brotli decoder (CVE-2026-111497).
-        // Clients of this server only ever send small uncompressed JSON GraphQL payloads.
-        express.json({inflate: false}),
+        express.json(),
         expressMiddleware(apolloServer, {
             context: async () => ({
                 onAddRepoRequest: settings.onAddRepoRequest,

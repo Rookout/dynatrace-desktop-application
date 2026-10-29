@@ -247,12 +247,7 @@ async function update() {
 
 async function getLatestVersionName() {
   const LATEST_VERSION_URL = "https://api.github.com/repos/Rookout/dynatrace-desktop-application/releases/latest";
-  // Never decompress the response: Node's brotli decoder is vulnerable to CVE-2026-111497.
-  // This endpoint returns a small JSON body, so skipping compression costs nothing.
-  const response = await fetch(LATEST_VERSION_URL, {
-    compress: false,
-    headers: {"Accept-Encoding": "identity"}
-  });
+  const response = await fetch(LATEST_VERSION_URL);
   if (!response.ok) {
     throw new Error(`Error fetching latest version. Got: ${response.status} status with body: ${await response.text()}`);
   }
